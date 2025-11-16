@@ -1,16 +1,18 @@
 {
   "topics": [
-    "general conversation"
+    "Homework"
   ],
-  "dominantEmotion": "Neutral",
-  "sentimentScore": 50,
-  "summary": "Conversation with Harry Potter assistant.",
-  "keyPhrases": [],
-  "engagementLevel": "medium",
-  "questionCount": 0,
+  "dominantEmotion": "Frustrated",
+  "sentimentScore": 24,
+  "summary": "I don't know how to do my homework. Can you help me please. It seems like a lot of work to do my Transfiguration homework.",
+  "keyPhrases": [
+    "I don't know how to do my homework."
+  ],
+  "engagementLevel": "low",
+  "questionCount": 1,
   "breakthrough": false,
   "needsAttention": false,
-  "analyzedAt": "2025-11-16T02:28:25.419908",
-  "analysisLatencyMs": 0,
+  "analyzedAt": "2025-11-16T06:56:13.201416",
+  "analysisLatencyMs": 33245,
   "conversationId": 1
 }

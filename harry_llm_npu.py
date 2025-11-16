@@ -25,8 +25,21 @@ RULES:
 - Be natural and encouraging
 - Don't overdo wizarding references"""
     
-    def ask_harry(self, question):
-        prompt = f"<|begin_of_text|><|start_header_id|>user<|end_header_id|>\n\n{self.system_prompt}\n\nUser: {question}<|eot_id|><|start_header_id|>assistant<|end_header_id|>"
+    def ask_harry(self, question, system_prompt=None):
+        """
+        Ask Harry Potter a question
+        
+        Args:
+            question: The question to ask
+            system_prompt: Optional custom system prompt (defaults to Harry Potter prompt)
+        
+        Returns:
+            (response, latency_ms) tuple
+        """
+        if system_prompt is None:
+            system_prompt = self.system_prompt
+        
+        prompt = f"<|begin_of_text|><|start_header_id|>user<|end_header_id|>\n\n{system_prompt}\n\nUser: {question}<|eot_id|><|start_header_id|>assistant<|end_header_id|>"
         
         start = time.time()
         
@@ -40,7 +53,7 @@ RULES:
                 cwd=str(self.bundle_dir),
                 capture_output=True,
                 text=True,
-                timeout=30
+                timeout=60  # Increased timeout for analysis tasks
             )
             
             latency = int((time.time() - start) * 1000)

@@ -41,7 +41,7 @@ class ConversationAnalyzer:
         Args:
             cpu_mode: If True, skip analyzer (NPU is preferred, no CPU fallback)
         """
-        print("🔍 Initializing Conversation Analyzer...")
+        print("[ANALYZER] Initializing Conversation Analyzer...")
         
         self.cpu_mode = cpu_mode
         self.llm = None
@@ -50,10 +50,10 @@ class ConversationAnalyzer:
         try:
             from harry_llm_npu import HarryPotterNPU
             self.llm = HarryPotterNPU()
-            print("  ✅ Analyzer ready (using Genie NPU)")
+            print("  [OK] Analyzer ready (using Genie NPU)")
             
         except Exception as e:
-            print(f"  ⚠️  Analyzer initialization failed: {e}")
+            print(f"  [WARN] Analyzer initialization failed: {e}")
             print("     Insights will not be extracted.")
             self.llm = None
     
@@ -73,41 +73,39 @@ class ConversationAnalyzer:
         duration = metadata.get('audio_duration_seconds', 0)
         emotion = metadata.get('emotion', {})
         
-        prompt = f"""You are analyzing a conversation between a child and Harry Potter (AI companion).
+        prompt = f"""Analyze this conversation and return ONLY valid JSON, no other text.
 
-CONVERSATION DATA:
-User said: "{user_query}"
-Harry responded: "{harry_response}"
+CONVERSATION:
+User: "{user_query}"
+Harry: "{harry_response}"
 Duration: {duration} seconds
-Detected emotion: {emotion.get('detected', 'unknown')}
+Emotion: {emotion.get('detected', 'unknown')}
 
-YOUR TASK:
-Extract the following insights and return them as valid JSON:
-
-1. TOPICS: What subjects were discussed? (e.g., space, math, friends, art, school, family)
-2. DOMINANT_EMOTION: Child's overall emotional state (one of: Joyful, Calm, Neutral, Frustrated, Anxious, Excited, Curious, Worried, Happy, Stressed)
-3. SENTIMENT_SCORE: 0-100 (0-30=negative, 31-60=neutral, 61-100=positive)
-4. SUMMARY: 2-3 sentence neutral summary
-5. KEY_PHRASES: Important phrases (de-identified, no real names)
-6. ENGAGEMENT_LEVEL: "low", "medium", or "high"
-7. QUESTION_COUNT: Number of questions the child asked
-8. LEARNING_BREAKTHROUGH: Did child have an "aha" moment? true/false
-9. NEEDS_ATTENTION: Should parent check in? true/false
-
-Return ONLY valid JSON in this exact format:
+Return this exact JSON structure:
 {{
   "topics": ["topic1", "topic2"],
   "dominantEmotion": "Excited",
   "sentimentScore": 85,
-  "summary": "Child discussed...",
-  "keyPhrases": ["phrase1", "phrase2"],
+  "summary": "Brief summary here",
+  "keyPhrases": ["phrase1"],
   "engagementLevel": "high",
-  "questionCount": 3,
+  "questionCount": 1,
   "breakthrough": false,
   "needsAttention": false
 }}
 
-Return ONLY the JSON, no other text."""
+Rules:
+- topics: list of subjects (e.g., ["homework", "math", "school"])
+- dominantEmotion: one of: Joyful, Calm, Neutral, Frustrated, Anxious, Excited, Curious, Worried, Happy, Stressed
+- sentimentScore: 0-100 number (0-30=negative, 31-60=neutral, 61-100=positive)
+- summary: 2-3 sentence summary
+- keyPhrases: array of important phrases
+- engagementLevel: "low", "medium", or "high"
+- questionCount: number of questions asked
+- breakthrough: true or false
+- needsAttention: true or false
+
+Return ONLY the JSON object, nothing else."""
 
         return prompt
     
@@ -121,22 +119,128 @@ Return ONLY the JSON, no other text."""
         Returns:
             Parsed insights dictionary
         """
+        if not response:
+            print("  [WARN] Empty LLM response")
+            return self.get_default_insights()
+        
+        # Log the raw response for debugging (first 500 chars)
+        print(f"  [DEBUG] LLM response preview: {response[:500]}...")
+        
         try:
-            # Try to find JSON in response
+            # Strategy 1: Try to find JSON object in response
             start_idx = response.find('{')
             end_idx = response.rfind('}')
             
             if start_idx >= 0 and end_idx > start_idx:
                 json_str = response[start_idx:end_idx+1]
-                insights = json.loads(json_str)
-                return insights
-            else:
-                print("  ⚠️  No JSON found in LLM response")
-                return self.get_default_insights()
                 
-        except json.JSONDecodeError as e:
-            print(f"  ⚠️  JSON parse error: {e}")
+                # Try to parse as-is
+                try:
+                    insights = json.loads(json_str)
+                    # Validate required fields
+                    if self._validate_insights(insights):
+                        return insights
+                except json.JSONDecodeError:
+                    pass
+                
+                # Strategy 2: Try to clean up common issues
+                # Remove markdown code blocks
+                json_str = json_str.replace('```json', '').replace('```', '').strip()
+                
+                # Try parsing again
+                try:
+                    insights = json.loads(json_str)
+                    if self._validate_insights(insights):
+                        return insights
+                except json.JSONDecodeError:
+                    pass
+                
+                # Strategy 3: Try to extract JSON from lines
+                lines = json_str.split('\n')
+                json_lines = []
+                in_json = False
+                for line in lines:
+                    line = line.strip()
+                    if line.startswith('{'):
+                        in_json = True
+                    if in_json:
+                        json_lines.append(line)
+                    if line.endswith('}') and in_json:
+                        break
+                
+                if json_lines:
+                    try:
+                        json_str = ' '.join(json_lines)
+                        insights = json.loads(json_str)
+                        if self._validate_insights(insights):
+                            return insights
+                    except json.JSONDecodeError:
+                        pass
+            
+            # Strategy 4: Try to parse entire response as JSON
+            try:
+                insights = json.loads(response.strip())
+                if self._validate_insights(insights):
+                    return insights
+            except json.JSONDecodeError:
+                pass
+            
+            print("  [WARN] No valid JSON found in LLM response")
+            print(f"  [DEBUG] Full response: {response[:1000]}")
             return self.get_default_insights()
+                
+        except Exception as e:
+            print(f"  [WARN] JSON parse error: {e}")
+            print(f"  [DEBUG] Response was: {response[:500]}")
+            return self.get_default_insights()
+    
+    def _validate_insights(self, insights: dict) -> bool:
+        """Validate that insights have required fields and fix common issues"""
+        required_fields = ['topics', 'dominantEmotion', 'sentimentScore']
+        if not all(field in insights for field in required_fields):
+            return False
+        
+        # Fix common issues
+        # 1. Remove duplicate topics
+        if 'topics' in insights and isinstance(insights['topics'], list):
+            insights['topics'] = list(dict.fromkeys(insights['topics']))  # Preserves order
+        
+        # 2. Ensure engagementLevel is valid
+        if 'engagementLevel' in insights:
+            valid_levels = ['low', 'medium', 'high']
+            if insights['engagementLevel'] not in valid_levels:
+                # Try to infer from emotion or sentiment
+                emotion = insights.get('dominantEmotion', '').lower()
+                sentiment = insights.get('sentimentScore', 50)
+                if 'frustrated' in emotion or 'anxious' in emotion or 'worried' in emotion:
+                    insights['engagementLevel'] = 'low'
+                elif sentiment > 70 or 'excited' in emotion or 'curious' in emotion:
+                    insights['engagementLevel'] = 'high'
+                else:
+                    insights['engagementLevel'] = 'medium'
+        
+        # 3. Ensure sentimentScore is a number
+        if 'sentimentScore' in insights:
+            try:
+                insights['sentimentScore'] = int(insights['sentimentScore'])
+                # Clamp to 0-100
+                insights['sentimentScore'] = max(0, min(100, insights['sentimentScore']))
+            except (ValueError, TypeError):
+                insights['sentimentScore'] = 50
+        
+        # 4. Ensure questionCount is a number
+        if 'questionCount' in insights:
+            try:
+                insights['questionCount'] = int(insights['questionCount'])
+            except (ValueError, TypeError):
+                insights['questionCount'] = 0
+        
+        # 5. Ensure boolean fields are boolean
+        for bool_field in ['breakthrough', 'needsAttention']:
+            if bool_field in insights:
+                insights[bool_field] = bool(insights[bool_field])
+        
+        return True
     
     def get_default_insights(self) -> dict:
         """Return default insights if extraction fails"""
@@ -159,13 +263,13 @@ Return ONLY the JSON, no other text."""
         Args:
             conv_dir: Path to conversation directory
         """
-        print(f"\n🔍 Analyzing conversation: {conv_dir.name}")
+        print(f"\n[ANALYZE] Analyzing conversation: {conv_dir.name}")
         
         try:
             # Load metadata
             metadata_path = conv_dir / "metadata.json"
             if not metadata_path.exists():
-                print("  ⚠️  No metadata.json found")
+                print("  [WARN] No metadata.json found")
                 return
             
             with open(metadata_path, 'r', encoding='utf-8') as f:
@@ -182,24 +286,29 @@ Return ONLY the JSON, no other text."""
             # Check if insights already exist
             insights_path = conv_dir / "insights.json"
             if insights_path.exists():
-                print("  ✅ Insights already exist, skipping")
+                print("  [SKIP] Insights already exist, skipping")
                 return
             
             # Create extraction prompt
             prompt = self.create_extraction_prompt(metadata, transcript)
             
             # Run LLM analysis
-            print("  🧠 Running LLM analysis...")
+            print("  [LLM] Running LLM analysis...")
             start_time = time.time()
             
             if self.llm:
-                response, latency = self.llm.ask_harry(prompt)
-                print(f"  ✅ Analysis complete ({latency}ms)")
+                # Use a custom system prompt for analysis (not Harry Potter character)
+                analysis_system_prompt = """You are an expert conversation analyst. 
+Your job is to analyze conversations and extract structured insights.
+Always return valid JSON format, no other text."""
+                
+                response, latency = self.llm.ask_harry(prompt, system_prompt=analysis_system_prompt)
+                print(f"  [OK] Analysis complete ({latency}ms)")
                 
                 # Parse insights
                 insights = self.parse_llm_response(response)
             else:
-                print("  ⚠️  No LLM available, using defaults")
+                print("  [WARN] No LLM available, using defaults")
                 insights = self.get_default_insights()
             
             # Add metadata
@@ -207,22 +316,30 @@ Return ONLY the JSON, no other text."""
             insights['analysisLatencyMs'] = int((time.time() - start_time) * 1000)
             insights['conversationId'] = metadata.get('conversation_id', 0)
             
+            # Add user/child IDs if available
+            if 'userId' in metadata:
+                insights['userId'] = metadata['userId']
+            if 'childId' in metadata:
+                insights['childId'] = metadata['childId']
+            
             # Save insights
             with open(insights_path, 'w', encoding='utf-8') as f:
                 json.dump(insights, f, indent=2, ensure_ascii=False)
             
-            print(f"  💾 Insights saved to: {insights_path.name}")
+            print(f"  [SAVED] Insights saved to: {insights_path.name}")
             print(f"     Topics: {', '.join(insights.get('topics', []))}")
             print(f"     Emotion: {insights.get('dominantEmotion', 'N/A')}")
             print(f"     Engagement: {insights.get('engagementLevel', 'N/A')}")
             
             if insights.get('breakthrough'):
-                print("     🎉 BREAKTHROUGH DETECTED!")
+                print("     [BREAKTHROUGH] BREAKTHROUGH DETECTED!")
             if insights.get('needsAttention'):
-                print("     ⚠️  NEEDS PARENT ATTENTION")
+                print("     [ATTENTION] NEEDS PARENT ATTENTION")
+            
+            # Insights saved to JSON file (for hackathon demo)
             
         except Exception as e:
-            print(f"  ❌ Analysis failed: {e}")
+            print(f"  [ERROR] Analysis failed: {e}")
             import traceback
             traceback.print_exc()
     
@@ -244,11 +361,11 @@ Return ONLY the JSON, no other text."""
         Args:
             conversations_root: Root conversations directory
         """
-        print("🔍 Batch analyzing conversations...")
+        print("[BATCH] Batch analyzing conversations...")
         print("="*70)
         
         if not conversations_root.exists():
-            print("  ⚠️  No conversations directory found")
+            print("  [WARN] No conversations directory found")
             return
         
         # Find all conversation directories
@@ -278,7 +395,7 @@ Return ONLY the JSON, no other text."""
         
         print()
         print("="*70)
-        print(f"✅ Batch analysis complete!")
+        print(f"[OK] Batch analysis complete!")
         print(f"   Analyzed: {analyzed}")
         print(f"   Skipped (already had insights): {skipped}")
         print(f"   Total: {len(conv_dirs)}")

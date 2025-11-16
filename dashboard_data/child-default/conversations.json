@@ -1,0 +1,158 @@
+[
+  {
+    "id": 1,
+    "childId": "child-default",
+    "userId": "user-default",
+    "timestamp": "2025-11-16T02:28:25.393599",
+    "date": "20251116",
+    "convDir": "conv_0001_022825",
+    "userQuery": "I don't know how to do my homework. Can you help me please?",
+    "harryResponse": "It's not exactly homework, it's just a bit of extra work to help me with my Transfiguration homework. Let's just say it's a Quidditch match of a problem, and I need someone to lend a hand.",
+    "summary": "I don't know how to do my homework. Can you help me please. It seems like a lot of work to do my Transfiguration homework.",
+    "topics": [
+      "Homework"
+    ],
+    "dominantEmotion": "Frustrated",
+    "sentimentScore": 24,
+    "engagementLevel": "low",
+    "questionCount": 1,
+    "breakthrough": false,
+    "needsAttention": false,
+    "keyPhrases": [
+      "I don't know how to do my homework."
+    ],
+    "analyzedAt": "2025-11-16T06:56:13.201416"
+  },
+  {
+    "id": 1,
+    "childId": "child-default",
+    "userId": "user-default",
+    "timestamp": "2025-11-16T02:03:29.293054",
+    "date": "20251116",
+    "convDir": "conv_0001_020329",
+    "userQuery": "Hello my name is Abadraken, I don't know what to talk about.",
+    "harryResponse": "You're not from around here, are you? What brings you to Hogwarts?",
+    "summary": "Conversation with Harry Potter assistant.",
+    "topics": [
+      "general conversation"
+    ],
+    "dominantEmotion": "Neutral",
+    "sentimentScore": 50,
+    "engagementLevel": "medium",
+    "questionCount": 0,
+    "breakthrough": false,
+    "needsAttention": false,
+    "keyPhrases": [],
+    "analyzedAt": "2025-11-16T06:51:28.847081"
+  },
+  {
+    "id": 1,
+    "childId": "child-default",
+    "userId": "user-default",
+    "timestamp": "2025-11-16T01:26:01.546546",
+    "date": "20251116",
+    "convDir": "conv_0001_012601",
+    "userQuery": "I'm a bit scared. I need to figure out how to make this run and it's not running.",
+    "harryResponse": "Error: ",
+    "summary": "Conversation with Harry Potter assistant.",
+    "topics": [
+      "general conversation"
+    ],
+    "dominantEmotion": "Neutral",
+    "sentimentScore": 50,
+    "engagementLevel": "medium",
+    "questionCount": 0,
+    "breakthrough": false,
+    "needsAttention": false,
+    "keyPhrases": [],
+    "analyzedAt": "2025-11-16T06:50:57.664515"
+  },
+  {
+    "id": 1,
+    "childId": "child-default",
+    "userId": "user-default",
+    "timestamp": "2025-11-15T22:24:21.524301",
+    "date": "20251115",
+    "convDir": "conv_0001_222421",
+    "userQuery": "I love McDonald's. Do you like McDonald's?",
+    "harryResponse": "I've had my fair share of greasy fast food, mate. McDonald's is alright, I suppose, but I'd rather have a butterbeer at the Three Broomsticks any day.",
+    "summary": "Conversation with Harry Potter assistant.",
+    "topics": [
+      "general conversation"
+    ],
+    "dominantEmotion": "Neutral",
+    "sentimentScore": 50,
+    "engagementLevel": "medium",
+    "questionCount": 0,
+    "breakthrough": false,
+    "needsAttention": false,
+    "keyPhrases": [],
+    "analyzedAt": "2025-11-16T06:50:26.694912"
+  },
+  {
+    "id": 1,
+    "childId": "child-default",
+    "userId": "user-default",
+    "timestamp": "2025-11-15T21:37:17.305843",
+    "date": "20251115",
+    "convDir": "conv_0001_213717",
+    "userQuery": "Do you know what photosynthesis is? I really want to know about it.",
+    "harryResponse": "It's actually plants that can do photosynthesis, like the ones in the Hogwarts garden, but I think you might be thinking of the way plants make their own food, like I do, by using sunlight, water, and carbon dioxide.",
+    "summary": "Conversation with Harry Potter assistant.",
+    "topics": [
+      "general conversation"
+    ],
+    "dominantEmotion": "Neutral",
+    "sentimentScore": 50,
+    "engagementLevel": "medium",
+    "questionCount": 0,
+    "breakthrough": false,
+    "needsAttention": false,
+    "keyPhrases": [],
+    "analyzedAt": "2025-11-16T06:49:55.748242"
+  },
+  {
+    "id": 1,
+    "childId": "child-default",
+    "userId": "user-default",
+    "timestamp": "2025-11-16T05:52:15.098939",
+    "date": "20251116",
+    "convDir": "conv_0001_055215",
+    "userQuery": "I need help. Can you help me? Can you also teach me your favorite spell? Thank you.",
+    "harryResponse": "I'm happy to help, mate! I've got some brilliant ones up my sleeve, but I'm all ears. What's got you feeling stuck, then? What's on your mind?",
+    "summary": "Conversation with Harry Potter assistant.",
+    "topics": [
+      "general conversation"
+    ],
+    "dominantEmotion": "Neutral",
+    "sentimentScore": 50,
+    "engagementLevel": "medium",
+    "questionCount": 0,
+    "breakthrough": false,
+    "needsAttention": false,
+    "keyPhrases": [],
+    "analyzedAt": "2025-11-16T05:52:45.868162"
+  },
+  {
+    "id": 1,
+    "childId": "child-default",
+    "userId": "user-default",
+    "timestamp": "2025-11-16T05:26:06.194892",
+    "date": "20251116",
+    "convDir": "conv_0001_052606",
+    "userQuery": "Do you know any of what's your favorite spell? Thank you.",
+    "harryResponse": "Error: ",
+    "summary": "Conversation with Harry Potter assistant.",
+    "topics": [
+      "general conversation"
+    ],
+    "dominantEmotion": "Neutral",
+    "sentimentScore": 50,
+    "engagementLevel": "medium",
+    "questionCount": 0,
+    "breakthrough": false,
+    "needsAttention": false,
+    "keyPhrases": [],
+    "analyzedAt": "2025-11-16T05:26:06.356816"
+  }
+]

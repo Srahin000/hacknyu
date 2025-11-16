@@ -88,6 +88,21 @@ class HarryVoiceAssistant:
                 print(f"⚠️  Context system disabled: {e}")
                 self.enable_context = False
         
+        # User/Child management
+        self.user_manager = None
+        self.current_user = None
+        self.current_child = None
+        try:
+            from user_child_manager import UserChildManager
+            self.user_manager = UserChildManager()
+            # Ensure default user/child exists
+            self.current_user, self.current_child = self.user_manager.ensure_default_setup()
+            print(f"👤 User: {self.current_user['name']} ({self.current_user['email']})")
+            print(f"👶 Child: {self.current_child['name']} (ID: {self.current_child['childId']})")
+        except Exception as e:
+            print(f"⚠️  User/Child management disabled: {e}")
+            self.current_child = {"childId": "child-default"}
+        
         # Conversation analyzer (generates insights in background)
         self.analyzer = None
         if self.enable_insights:
@@ -422,6 +437,12 @@ class HarryVoiceAssistant:
             "emotion_type": self.emotion_type,
             "wake_word_type": self.wake_word_type
         }
+        
+        # Add user/child IDs if available
+        if self.current_user:
+            metadata["userId"] = self.current_user.get("userId")
+        if self.current_child:
+            metadata["childId"] = self.current_child.get("childId")
         
         # Add emotion data if available
         if emotion_data and emotion_data[0]:

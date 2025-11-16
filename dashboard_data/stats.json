@@ -1,0 +1,133 @@
+{
+  "generatedAt": "2025-11-16T07:00:45.691506",
+  "summary": {
+    "totalConversations": 7,
+    "totalQuestions": 1,
+    "totalBreakthroughs": 0,
+    "attentionNeeded": 0,
+    "avgSentiment": 46.3
+  },
+  "topics": {
+    "topTopics": [
+      {
+        "name": "general conversation",
+        "count": 6
+      },
+      {
+        "name": "Homework",
+        "count": 1
+      }
+    ],
+    "totalUniqueTopics": 2
+  },
+  "emotions": {
+    "distribution": {
+      "Neutral": 6,
+      "Frustrated": 1
+    },
+    "mostCommon": "Neutral"
+  },
+  "engagement": {
+    "distribution": {
+      "medium": 6,
+      "low": 1
+    },
+    "high": 0,
+    "medium": 6,
+    "low": 1
+  },
+  "timeline": [
+    {
+      "date": "20251115",
+      "conversations": 2,
+      "avgSentiment": 50.0,
+      "breakthroughs": 0,
+      "topicsCount": 1
+    },
+    {
+      "date": "20251116",
+      "conversations": 5,
+      "avgSentiment": 44.8,
+      "breakthroughs": 0,
+      "topicsCount": 2
+    }
+  ],
+  "recentConversations": [
+    {
+      "id": 1,
+      "date": "20251116",
+      "userQuery": "I don't know how to do my homework. Can you help me please?",
+      "topics": [
+        "Homework"
+      ],
+      "emotion": "Frustrated",
+      "sentiment": 24,
+      "engagement": "low",
+      "breakthrough": false,
+      "summary": "I don't know how to do my homework. Can you help me please. It seems like a lot of work to do my Transfiguration homework."
+    },
+    {
+      "id": 1,
+      "date": "20251116",
+      "userQuery": "Hello my name is Abadraken, I don't know what to talk about.",
+      "topics": [
+        "general conversation"
+      ],
+      "emotion": "Neutral",
+      "sentiment": 50,
+      "engagement": "medium",
+      "breakthrough": false,
+      "summary": "Conversation with Harry Potter assistant."
+    },
+    {
+      "id": 1,
+      "date": "20251116",
+      "userQuery": "I'm a bit scared. I need to figure out how to make this run and it's not running.",
+      "topics": [
+        "general conversation"
+      ],
+      "emotion": "Neutral",
+      "sentiment": 50,
+      "engagement": "medium",
+      "breakthrough": false,
+      "summary": "Conversation with Harry Potter assistant."
+    },
+    {
+      "id": 1,
+      "date": "20251115",
+      "userQuery": "I love McDonald's. Do you like McDonald's?",
+      "topics": [
+        "general conversation"
+      ],
+      "emotion": "Neutral",
+      "sentiment": 50,
+      "engagement": "medium",
+      "breakthrough": false,
+      "summary": "Conversation with Harry Potter assistant."
+    },
+    {
+      "id": 1,
+      "date": "20251115",
+      "userQuery": "Do you know what photosynthesis is? I really want to know about it.",
+      "topics": [
+        "general conversation"
+      ],
+      "emotion": "Neutral",
+      "sentiment": 50,
+      "engagement": "medium",
+      "breakthrough": false,
+      "summary": "Conversation with Harry Potter assistant."
+    }
+  ],
+  "keyPhrases": [
+    {
+      "phrase": "I don't know how to do my homework.",
+      "count": 1
+    }
+  ],
+  "insights": {
+    "breakthroughRate": 0.0,
+    "avgQuestionsPerConversation": 0.1,
+    "attentionRate": 0.0
+  }
+}
