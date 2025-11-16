@@ -1,0 +1,24 @@
+# Qualcomm AI Hub dependencies
+qai-hub>=0.40.0
+qai-hub-models>=0.17.0
+
+# PyTorch for model tracing
+torch>=2.0.0
+torchaudio>=2.0.0
+
+# ONNX support
+onnx>=1.14.0
+onnxruntime>=1.15.0
+
+# Utilities
+numpy>=1.24.0
+requests>=2.31.0
+sounddevice>=0.4.0  # Required for audio capture
+transformers>=4.30.0  # Required for Whisper and Wav2Vec2 models
+python-dotenv>=1.0.0  # For loading .env files
+
+# TTS (Text-to-Speech) - Requires Python 3.10
+TTS>=0.22.0  # Coqui TTS (offline, high quality)
+
+# Audio processing
+librosa>=0.10.0  # Audio loading and processing

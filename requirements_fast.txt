@@ -1,0 +1,30 @@
+# Fast installation with pinned versions for Python 3.10
+# Install in order to avoid dependency conflicts
+
+# Core Qualcomm
+qai-hub==0.40.0
+qai-hub-models==0.17.0
+
+# PyTorch (install first, it's the biggest dependency)
+torch==2.1.0
+torchaudio==2.1.0
+
+# Transformers (with specific version)
+transformers==4.35.0
+
+# Audio processing
+librosa==0.10.1
+sounddevice==0.4.6
+
+# ONNX
+onnx==1.15.0
+onnxruntime==1.16.3
+
+# Utilities
+numpy==1.24.3
+requests==2.31.0
+python-dotenv==1.0.0
+
+# TTS - Install separately after everything else
+TTS==0.22.0
+
