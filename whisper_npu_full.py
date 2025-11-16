@@ -1,10 +1,16 @@
 """
 Full NPU Whisper - Encoder + Decoder on Snapdragon X Elite
+
+Uses QNN Runtime with .bin files (not ONNX):
+- HfWhisperApp from qai_hub_models.models._shared.hf_whisper.app
+- OnnxModelTorchWrapper.OnNPU() can accept both .bin (QNN) and .onnx files
+- Prefers .bin files for QNN runtime, falls back to .onnx if needed
+
+Reference: https://github.com/quic/ai-hub-apps/tree/main/apps/windows/python/Whisper
 """
 
 import os
 import numpy as np
-import onnxruntime as ort
 import time
 from pathlib import Path
 
@@ -14,149 +20,105 @@ os.environ['PATH'] = f"C:\\Qualcomm\\AIStack\\QAIRT\\2.31.0.250130\\lib\\aarch64
 
 
 class WhisperNPU:
-    """Full Whisper on NPU - Encoder + Decoder"""
+    """Full Whisper on NPU - Encoder + Decoder using official Qualcomm approach"""
     
     def __init__(self):
-        """Load encoder and decoder on NPU"""
+        """Load encoder and decoder on NPU using official Qualcomm method"""
         
-        encoder_path = Path("models/whisper_base2/model.onnx")
-        decoder_path = Path("models/whisper_base/model.onnx")
+        print("Loading Whisper Encoder and Decoder on NPU...")
         
-        qnn_options = {
-            'backend_path': 'QnnHtp.dll',
-            'qnn_context_cache_enable': '1',
-        }
-        
-        print("Loading Whisper Encoder on NPU...")
-        self.encoder = ort.InferenceSession(
-            str(encoder_path),
-            providers=['QNNExecutionProvider', 'CPUExecutionProvider'],
-            provider_options=[qnn_options, {}]
-        )
-        
-        print("Loading Whisper Decoder on NPU...")
-        self.decoder = ort.InferenceSession(
-            str(decoder_path),
-            providers=['QNNExecutionProvider', 'CPUExecutionProvider'],
-            provider_options=[qnn_options, {}]
-        )
-        
-        encoder_provider = self.encoder.get_providers()[0]
-        decoder_provider = self.decoder.get_providers()[0]
-        
-        print(f"Encoder on: {encoder_provider}")
-        print(f"Decoder on: {decoder_provider}")
-        
-        self.inference_type = f"NPU ({encoder_provider})"
-        
-        # Get input specs
-        self.encoder_inputs = self.encoder.get_inputs()
-        self.decoder_inputs = self.decoder.get_inputs()
-        
-    def preprocess_audio(self, audio, sample_rate):
-        """Preprocess audio to mel spectrogram"""
-        # Import mel spectrogram tools
         try:
-            import librosa
-            # Resample to 16kHz if needed
-            if sample_rate != 16000:
-                audio = librosa.resample(audio, orig_sr=sample_rate, target_sr=16000)
-            
-            # Compute mel spectrogram
-            mel = librosa.feature.melspectrogram(
-                y=audio,
-                sr=16000,
-                n_fft=400,
-                hop_length=160,
-                n_mels=80,
-                fmax=8000
+            from qai_hub_models.models._shared.hf_whisper.app import HfWhisperApp
+            from qai_hub_models.utils.onnx.torch_wrapper import OnnxModelTorchWrapper
+        except ImportError as e:
+            raise ImportError(f"qai_hub_models not properly installed: {e}")
+        
+        # Check for QNN runtime .bin files first, then fallback to .onnx
+        # QNN runtime uses .bin files (not ONNX)
+        encoder_path = None
+        decoder_path = None
+        
+        # Try QNN .bin files first (QNN runtime artifacts)
+        possible_encoder_paths = [
+            "models/whisper_base-hfwhisperencoder-qualcomm_snapdragon_x_elite.bin",
+            "models/whisper_base2/model.bin",
+            "models/HfWhisperEncoder/model.bin",
+            "models/HfWhisperEncoder/model.onnx",  # Fallback to ONNX
+            "build/whisper_base_float/precompiled/qualcomm-snapdragon-x-elite/HfWhisperEncoder/model.onnx",
+        ]
+        
+        possible_decoder_paths = [
+            "models/whisper_base-hfwhisperdecoder-qualcomm_snapdragon_x_elite.bin",
+            "models/whisper_base/model.bin",
+            "models/HfWhisperDecoder/model.bin",
+            "models/HfWhisperDecoder/model.onnx",  # Fallback to ONNX
+            "build/whisper_base_float/precompiled/qualcomm-snapdragon-x-elite/HfWhisperDecoder/model.onnx",
+        ]
+        
+        for path in possible_encoder_paths:
+            if Path(path).exists():
+                encoder_path = path
+                break
+        
+        for path in possible_decoder_paths:
+            if Path(path).exists():
+                decoder_path = path
+                break
+        
+        if not encoder_path or not decoder_path:
+            raise FileNotFoundError(
+                f"Whisper models not found. Expected QNN runtime .bin files:\n"
+                f"  - models/whisper_base-hfwhisperencoder-qualcomm_snapdragon_x_elite.bin\n"
+                f"  - models/whisper_base-hfwhisperdecoder-qualcomm_snapdragon_x_elite.bin\n"
+                f"\nOr ONNX fallback:\n"
+                f"  - models/HfWhisperEncoder/model.onnx\n"
+                f"  - models/HfWhisperDecoder/model.onnx"
+            )
+        
+        print(f"  Using encoder: {encoder_path}")
+        print(f"  Using decoder: {decoder_path}")
+        
+        try:
+            # Use official Qualcomm approach
+            self.app = HfWhisperApp(
+                OnnxModelTorchWrapper.OnNPU(encoder_path),
+                OnnxModelTorchWrapper.OnNPU(decoder_path),
+                "openai/whisper-base",  # Model size
             )
             
-            # Convert to log scale
-            mel = np.log10(np.maximum(mel, 1e-10))
+            self.inference_type = "NPU (QNN Runtime)"
+            print(f"  [OK] Whisper loaded on NPU (QNN Runtime)")
             
-            return mel.astype(np.float32)
-            
-        except ImportError:
-            # Fallback: simple approach without librosa
-            # Pad/trim to 30 seconds worth of mel frames (3000 frames)
-            n_frames = 3000
-            n_mels = 80
-            mel = np.zeros((n_mels, n_frames), dtype=np.float32)
-            return mel
+        except Exception as e:
+            print(f"  [ERROR] Failed to load Whisper models: {e}")
+            import traceback
+            traceback.print_exc()
+            raise
     
     def transcribe(self, audio, sample_rate):
-        """Full transcription on NPU"""
+        """
+        Transcribe audio to text using NPU
         
+        Args:
+            audio: Audio array (numpy array, float32, normalized to [-1, 1])
+            sample_rate: Sample rate (Hz)
+        
+        Returns:
+            tuple: (transcription_text, latency_ms)
+        """
         start_time = time.time()
         
-        # 1. Preprocess audio to mel spectrogram
-        mel = self.preprocess_audio(audio, sample_rate)
-        
-        # 2. Get encoder input shape
-        encoder_input_name = self.encoder_inputs[0].name
-        encoder_shape = self.encoder_inputs[0].shape
-        
-        # Prepare encoder input (add batch dimension)
-        if len(mel.shape) == 2:
-            mel = mel[np.newaxis, ...]  # Add batch dim
-        
-        # 3. Run encoder on NPU
-        encoder_output = self.encoder.run(None, {encoder_input_name: mel})
-        audio_features = encoder_output[0]
-        
-        # 4. Decode using greedy decoding
-        # Start with SOT token (50258)
-        tokens = [50258]  # Start of transcript
-        
-        # Prepare decoder inputs
-        max_tokens = 50  # Max tokens to generate
-        
-        for i in range(max_tokens):
-            # Prepare decoder inputs
-            input_ids = np.array([[tokens[-1]]], dtype=np.int32)
-            
-            # Create attention mask and caches (zeros for simplicity)
-            decoder_feeds = {self.decoder_inputs[0].name: input_ids}
-            
-            # Add other required inputs (attention mask, caches, etc.)
-            for inp in self.decoder_inputs[1:]:
-                shape = [1 if isinstance(d, str) else d for d in inp.shape]
-                if 'int' in inp.type:
-                    decoder_feeds[inp.name] = np.zeros(shape, dtype=np.int32)
-                else:
-                    decoder_feeds[inp.name] = np.zeros(shape, dtype=np.float32)
-            
-            # Run decoder
-            decoder_output = self.decoder.run(None, decoder_feeds)
-            logits = decoder_output[0]
-            
-            # Get next token
-            next_token = int(np.argmax(logits[0, :, 0, 0]))
-            
-            # Check for end token (50257)
-            if next_token == 50257:
-                break
-                
-            tokens.append(next_token)
-        
-        # 5. Decode tokens to text
-        text = self.decode_tokens(tokens)
-        
-        latency = int((time.time() - start_time) * 1000)
-        
-        return text, latency
-    
-    def decode_tokens(self, tokens):
-        """Decode token IDs to text"""
-        # For now, return token count (full tokenizer needed for real text)
-        # In production, use tiktoken or whisper tokenizer
         try:
-            import tiktoken
-            encoding = tiktoken.get_encoding("gpt2")
-            text = encoding.decode(tokens)
-            return text
-        except:
-            # Fallback: return indication of tokens
-            return f"[{len(tokens)} tokens generated on NPU]"
-
+            # HfWhisperApp.transcribe expects both audio (numpy array) and sample_rate
+            # It handles all preprocessing and decoding internally
+            transcription = self.app.transcribe(audio, sample_rate)
+            
+            latency_ms = int((time.time() - start_time) * 1000)
+            
+            return transcription, latency_ms
+            
+        except Exception as e:
+            print(f"  [ERROR] Transcription error: {e}")
+            import traceback
+            traceback.print_exc()
+            return None, 0
