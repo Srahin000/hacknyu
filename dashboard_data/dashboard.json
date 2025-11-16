@@ -1,12 +1,12 @@
 {
   "stats": {
-    "generatedAt": "2025-11-16T07:00:45.691506",
+    "generatedAt": "2025-11-16T08:55:35.974853",
     "summary": {
-      "totalConversations": 7,
-      "totalQuestions": 1,
-      "totalBreakthroughs": 0,
-      "attentionNeeded": 0,
-      "avgSentiment": 46.3
+      "totalConversations": 11,
+      "totalQuestions": 4,
+      "totalBreakthroughs": 1,
+      "attentionNeeded": 1,
+      "avgSentiment": 44.9
     },
     "topics": {
       "topTopics": [
@@ -17,24 +17,60 @@
         {
           "name": "Homework",
           "count": 1
+        },
+        {
+          "name": "work",
+          "count": 1
+        },
+        {
+          "name": "life",
+          "count": 1
+        },
+        {
+          "name": "education",
+          "count": 1
+        },
+        {
+          "name": "Ask about your name",
+          "count": 1
+        },
+        {
+          "name": "question",
+          "count": 1
+        },
+        {
+          "name": "topic",
+          "count": 1
+        },
+        {
+          "name": "homework",
+          "count": 1
+        },
+        {
+          "name": "school",
+          "count": 1
         }
       ],
-      "totalUniqueTopics": 2
+      "totalUniqueTopics": 10
     },
     "emotions": {
       "distribution": {
         "Neutral": 6,
-        "Frustrated": 1
+        "Frustrated": 1,
+        "neutral": 1,
+        "Excited": 2,
+        "Unknown": 1
       },
       "mostCommon": "Neutral"
     },
     "engagement": {
       "distribution": {
-        "medium": 6,
-        "low": 1
+        "medium": 8,
+        "low": 1,
+        "high": 2
       },
-      "high": 0,
-      "medium": 6,
+      "high": 2,
+      "medium": 8,
       "low": 1
     },
     "timeline": [
@@ -47,13 +83,69 @@
       },
       {
         "date": "20251116",
-        "conversations": 5,
-        "avgSentiment": 44.8,
-        "breakthroughs": 0,
-        "topicsCount": 2
+        "conversations": 9,
+        "avgSentiment": 43.8,
+        "breakthroughs": 1,
+        "topicsCount": 10
       }
     ],
     "recentConversations": [
+      {
+        "id": 1,
+        "date": "20251116",
+        "userQuery": "What is your dad's name?",
+        "topics": [
+          "question",
+          "topic"
+        ],
+        "emotion": "Unknown",
+        "sentiment": 0,
+        "engagement": "medium",
+        "breakthrough": true,
+        "summary": "No clear sentiment detected, summary: No summary given."
+      },
+      {
+        "id": 2,
+        "date": "20251116",
+        "userQuery": "Do you think I need some help?",
+        "topics": [
+          "homework",
+          "school"
+        ],
+        "emotion": "Excited",
+        "sentiment": 85,
+        "engagement": "high",
+        "breakthrough": false,
+        "summary": "You're feeling more motivated and engaged now that we've started discussing your goals. This is a positive direction, and I'm happy to be a part of it."
+      },
+      {
+        "id": 1,
+        "date": "20251116",
+        "userQuery": "What is my name? Do you know my name?",
+        "topics": [
+          "Ask about your name"
+        ],
+        "emotion": "Excited",
+        "sentiment": 85,
+        "engagement": "high",
+        "breakthrough": false,
+        "summary": "You're seeking to know your name, but are asking multiple questions about your own identity."
+      },
+      {
+        "id": 1,
+        "date": "20251116",
+        "userQuery": "Can you tell me how life works? Thank you.",
+        "topics": [
+          "work",
+          "life",
+          "education"
+        ],
+        "emotion": "neutral",
+        "sentiment": 0,
+        "engagement": "medium",
+        "breakthrough": false,
+        "summary": "A neutral conversation about the meaning of life. It is a complex issue, and one must consider the importance of taking it one step at a time and being kind to oneself. Just like how one must learn to"
+      },
       {
         "id": 1,
         "date": "20251116",
@@ -66,77 +158,166 @@
         "engagement": "low",
         "breakthrough": false,
         "summary": "I don't know how to do my homework. Can you help me please. It seems like a lot of work to do my Transfiguration homework."
-      },
-      {
-        "id": 1,
-        "date": "20251116",
-        "userQuery": "Hello my name is Abadraken, I don't know what to talk about.",
-        "topics": [
-          "general conversation"
-        ],
-        "emotion": "Neutral",
-        "sentiment": 50,
-        "engagement": "medium",
-        "breakthrough": false,
-        "summary": "Conversation with Harry Potter assistant."
-      },
-      {
-        "id": 1,
-        "date": "20251116",
-        "userQuery": "I'm a bit scared. I need to figure out how to make this run and it's not running.",
-        "topics": [
-          "general conversation"
-        ],
-        "emotion": "Neutral",
-        "sentiment": 50,
-        "engagement": "medium",
-        "breakthrough": false,
-        "summary": "Conversation with Harry Potter assistant."
-      },
-      {
-        "id": 1,
-        "date": "20251115",
-        "userQuery": "I love McDonald's. Do you like McDonald's?",
-        "topics": [
-          "general conversation"
-        ],
-        "emotion": "Neutral",
-        "sentiment": 50,
-        "engagement": "medium",
-        "breakthrough": false,
-        "summary": "Conversation with Harry Potter assistant."
-      },
-      {
-        "id": 1,
-        "date": "20251115",
-        "userQuery": "Do you know what photosynthesis is? I really want to know about it.",
-        "topics": [
-          "general conversation"
-        ],
-        "emotion": "Neutral",
-        "sentiment": 50,
-        "engagement": "medium",
-        "breakthrough": false,
-        "summary": "Conversation with Harry Potter assistant."
       }
     ],
     "keyPhrases": [
       {
         "phrase": "I don't know how to do my homework.",
         "count": 1
+      },
+      {
+        "phrase": "life",
+        "count": 1
+      },
+      {
+        "phrase": "work",
+        "count": 1
+      },
+      {
+        "phrase": "education",
+        "count": 1
+      },
+      {
+        "phrase": "ask about your name,",
+        "count": 1
+      },
+      {
+        "phrase": "you're asking about your name",
+        "count": 1
+      },
+      {
+        "phrase": "Blimey",
+        "count": 1
+      },
+      {
+        "phrase": "love",
+        "count": 1
+      },
+      {
+        "phrase": "You're feeling more motivated",
+        "count": 1
+      },
+      {
+        "phrase": "You're feeling engaged",
+        "count": 1
       }
     ],
     "insights": {
-      "breakthroughRate": 0.0,
-      "avgQuestionsPerConversation": 0.1,
-      "attentionRate": 0.0
+      "breakthroughRate": 9.1,
+      "avgQuestionsPerConversation": 0.4,
+      "attentionRate": 9.1
     }
   },
   "conversations": [
     {
       "id": 1,
-      "childId": "child-default",
-      "userId": "user-default",
+      "childId": "child-cfdd2047ed7b",
+      "userId": "user-13ccb6163551",
+      "timestamp": "2025-11-16T08:27:51.739550",
+      "date": "20251116",
+      "convDir": "conv_0001_082751",
+      "userQuery": "What is your dad's name?",
+      "harryResponse": "Blimey, mate! My dad's name is George, love! He's a great bloke and a fantastic wizard, don't get me wrong!",
+      "summary": "No clear sentiment detected, summary: No summary given.",
+      "topics": [
+        "question",
+        "topic"
+      ],
+      "dominantEmotion": "Unknown",
+      "sentimentScore": 0,
+      "engagementLevel": "medium",
+      "questionCount": 1,
+      "breakthrough": true,
+      "needsAttention": true,
+      "keyPhrases": [
+        "Blimey",
+        "love"
+      ],
+      "analyzedAt": "2025-11-16T08:28:23.405854"
+    },
+    {
+      "id": 2,
+      "childId": "child-cfdd2047ed7b",
+      "userId": "user-13ccb6163551",
+      "timestamp": "2025-11-16T08:21:11.061393",
+      "date": "20251116",
+      "convDir": "conv_0002_082111",
+      "userQuery": "Do you think I need some help?",
+      "harryResponse": "Mate, it's great to be chatting with you again. I reckon you're lookin' for some support, eh? Well, I've been helpin' out with a few things lately, but I'm not one to boast, so it's not somethin' I've had to do myself, but I'm happy to lend a hand if you need it, bruh! What's on your mind, mate?",
+      "summary": "You're feeling more motivated and engaged now that we've started discussing your goals. This is a positive direction, and I'm happy to be a part of it.",
+      "topics": [
+        "homework",
+        "school"
+      ],
+      "dominantEmotion": "Excited",
+      "sentimentScore": 85,
+      "engagementLevel": "high",
+      "questionCount": 0,
+      "breakthrough": false,
+      "needsAttention": false,
+      "keyPhrases": [
+        "You're feeling more motivated",
+        "You're feeling engaged"
+      ],
+      "analyzedAt": "2025-11-16T08:21:47.280303"
+    },
+    {
+      "id": 1,
+      "childId": "child-cfdd2047ed7b",
+      "userId": "user-13ccb6163551",
+      "timestamp": "2025-11-16T08:19:37.282339",
+      "date": "20251116",
+      "convDir": "conv_0001_081937",
+      "userQuery": "What is my name? Do you know my name?",
+      "harryResponse": "Mate, you're askin' about your name, are ya? Well, I've got some good news for you: you don't have a name, which is a right tricky business, innit? But, you do have a special name, which I reckon is... you, yeah? Just kidding! Seriously, though, I don't know your name, mate. What do you call yourself?",
+      "summary": "You're seeking to know your name, but are asking multiple questions about your own identity.",
+      "topics": [
+        "Ask about your name"
+      ],
+      "dominantEmotion": "Excited",
+      "sentimentScore": 85,
+      "engagementLevel": "high",
+      "questionCount": 1,
+      "breakthrough": false,
+      "needsAttention": false,
+      "keyPhrases": [
+        "ask about your name,",
+        "you're asking about your name"
+      ],
+      "analyzedAt": "2025-11-16T08:20:22.670711"
+    },
+    {
+      "id": 1,
+      "childId": "child-cfdd2047ed7b",
+      "userId": "user-13ccb6163551",
+      "timestamp": "2025-11-16T08:16:16.573577",
+      "date": "20251116",
+      "convDir": "conv_0001_081616",
+      "userQuery": "Can you tell me how life works? Thank you.",
+      "harryResponse": "Blimey, mate! Life's like a tricky path, you've got to navigate with care and quick thinking. It's not always easy, but it's worth it in the end. Just like how I had to figure out how to outsmart the Malfoirs, you'll learn to do the same when you're dealing with homework. Just remember, it's all about taking it one step at a time and being kind to yourself. You can do it, mate!",
+      "summary": "A neutral conversation about the meaning of life. It is a complex issue, and one must consider the importance of taking it one step at a time and being kind to oneself. Just like how one must learn to navigate through life. Just like how one must figure out how to outsmart the Malfoirs.",
+      "topics": [
+        "work",
+        "life",
+        "education"
+      ],
+      "dominantEmotion": "neutral",
+      "sentimentScore": 0,
+      "engagementLevel": "medium",
+      "questionCount": 1,
+      "breakthrough": false,
+      "needsAttention": false,
+      "keyPhrases": [
+        "life",
+        "work",
+        "education"
+      ],
+      "analyzedAt": "2025-11-16T08:16:58.353899"
+    },
+    {
+      "id": 1,
+      "childId": "child-cfdd2047ed7b",
+      "userId": "user-13ccb6163551",
       "timestamp": "2025-11-16T02:28:25.393599",
       "date": "20251116",
       "convDir": "conv_0001_022825",
@@ -159,8 +340,8 @@
     },
     {
       "id": 1,
-      "childId": "child-default",
-      "userId": "user-default",
+      "childId": "child-cfdd2047ed7b",
+      "userId": "user-13ccb6163551",
       "timestamp": "2025-11-16T02:03:29.293054",
       "date": "20251116",
       "convDir": "conv_0001_020329",
@@ -181,8 +362,8 @@
     },
     {
       "id": 1,
-      "childId": "child-default",
-      "userId": "user-default",
+      "childId": "child-cfdd2047ed7b",
+      "userId": "user-13ccb6163551",
       "timestamp": "2025-11-16T01:26:01.546546",
       "date": "20251116",
       "convDir": "conv_0001_012601",
@@ -203,8 +384,8 @@
     },
     {
       "id": 1,
-      "childId": "child-default",
-      "userId": "user-default",
+      "childId": "child-cfdd2047ed7b",
+      "userId": "user-13ccb6163551",
       "timestamp": "2025-11-15T22:24:21.524301",
       "date": "20251115",
       "convDir": "conv_0001_222421",
@@ -225,8 +406,8 @@
     },
     {
       "id": 1,
-      "childId": "child-default",
-      "userId": "user-default",
+      "childId": "child-cfdd2047ed7b",
+      "userId": "user-13ccb6163551",
       "timestamp": "2025-11-15T21:37:17.305843",
       "date": "20251115",
       "convDir": "conv_0001_213717",
@@ -247,8 +428,8 @@
     },
     {
       "id": 1,
-      "childId": "child-default",
-      "userId": "user-default",
+      "childId": "child-cfdd2047ed7b",
+      "userId": "user-13ccb6163551",
       "timestamp": "2025-11-16T05:52:15.098939",
       "date": "20251116",
       "convDir": "conv_0001_055215",
@@ -269,8 +450,8 @@
     },
     {
       "id": 1,
-      "childId": "child-default",
-      "userId": "user-default",
+      "childId": "child-cfdd2047ed7b",
+      "userId": "user-13ccb6163551",
       "timestamp": "2025-11-16T05:26:06.194892",
       "date": "20251116",
       "convDir": "conv_0001_052606",

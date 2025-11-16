@@ -1,0 +1,16 @@
+{
+  "conversation_id": 2,
+  "timestamp": "2025-11-16T09:19:30.162437",
+  "date": "20251116",
+  "time": "091930",
+  "user_query": "about photosynthesis.",
+  "harry_response": "Blimey, mate! You're absolutely brilliant for keeping me sharp on photosynthesis, mate! It's a brilliant topic, innit, and I'm so glad we're having this chat about it!",
+  "sample_rate": 16000,
+  "audio_duration_seconds": 8.0,
+  "stt_type": "whisper-npu",
+  "tts_type": "pyttsx3",
+  "emotion_type": "none",
+  "wake_word_type": "picovoice",
+  "userId": "user-13ccb6163551",
+  "childId": "child-cfdd2047ed7b"
+}

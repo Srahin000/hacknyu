@@ -14,5 +14,7 @@
   "needsAttention": false,
   "analyzedAt": "2025-11-16T06:56:13.201416",
   "analysisLatencyMs": 33245,
-  "conversationId": 1
+  "conversationId": 1,
+  "userId": "user-13ccb6163551",
+  "childId": "child-cfdd2047ed7b"
 }

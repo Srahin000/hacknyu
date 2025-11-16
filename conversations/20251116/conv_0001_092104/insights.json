@@ -1,0 +1,20 @@
+{
+  "topics": [
+    "photosynthesis"
+  ],
+  "dominantEmotion": "Excited",
+  "sentimentScore": 85,
+  "summary": "A user expresses interest in photosynthesis, a complex process of how plants convert sunlight into energy.",
+  "keyPhrases": [
+    "Blimey, mate!"
+  ],
+  "engagementLevel": "high",
+  "questionCount": 1,
+  "breakthrough": false,
+  "needsAttention": false,
+  "analyzedAt": "2025-11-16T09:21:44.678168",
+  "analysisLatencyMs": 40493,
+  "conversationId": 1,
+  "userId": "user-13ccb6163551",
+  "childId": "child-cfdd2047ed7b"
+}

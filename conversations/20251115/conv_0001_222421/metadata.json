@@ -10,5 +10,7 @@
   "audio_duration_seconds": 8.0,
   "stt_type": "whisper-npu",
   "tts_type": "pyttsx3",
-  "wake_word_type": "picovoice"
+  "wake_word_type": "picovoice",
+  "userId": "user-13ccb6163551",
+  "childId": "child-cfdd2047ed7b"
 }

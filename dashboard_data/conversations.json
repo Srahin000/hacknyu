@@ -1,8 +1,113 @@
 [
   {
     "id": 1,
-    "childId": "child-default",
-    "userId": "user-default",
+    "childId": "child-cfdd2047ed7b",
+    "userId": "user-13ccb6163551",
+    "timestamp": "2025-11-16T08:27:51.739550",
+    "date": "20251116",
+    "convDir": "conv_0001_082751",
+    "userQuery": "What is your dad's name?",
+    "harryResponse": "Blimey, mate! My dad's name is George, love! He's a great bloke and a fantastic wizard, don't get me wrong!",
+    "summary": "No clear sentiment detected, summary: No summary given.",
+    "topics": [
+      "question",
+      "topic"
+    ],
+    "dominantEmotion": "Unknown",
+    "sentimentScore": 0,
+    "engagementLevel": "medium",
+    "questionCount": 1,
+    "breakthrough": true,
+    "needsAttention": true,
+    "keyPhrases": [
+      "Blimey",
+      "love"
+    ],
+    "analyzedAt": "2025-11-16T08:28:23.405854"
+  },
+  {
+    "id": 2,
+    "childId": "child-cfdd2047ed7b",
+    "userId": "user-13ccb6163551",
+    "timestamp": "2025-11-16T08:21:11.061393",
+    "date": "20251116",
+    "convDir": "conv_0002_082111",
+    "userQuery": "Do you think I need some help?",
+    "harryResponse": "Mate, it's great to be chatting with you again. I reckon you're lookin' for some support, eh? Well, I've been helpin' out with a few things lately, but I'm not one to boast, so it's not somethin' I've had to do myself, but I'm happy to lend a hand if you need it, bruh! What's on your mind, mate?",
+    "summary": "You're feeling more motivated and engaged now that we've started discussing your goals. This is a positive direction, and I'm happy to be a part of it.",
+    "topics": [
+      "homework",
+      "school"
+    ],
+    "dominantEmotion": "Excited",
+    "sentimentScore": 85,
+    "engagementLevel": "high",
+    "questionCount": 0,
+    "breakthrough": false,
+    "needsAttention": false,
+    "keyPhrases": [
+      "You're feeling more motivated",
+      "You're feeling engaged"
+    ],
+    "analyzedAt": "2025-11-16T08:21:47.280303"
+  },
+  {
+    "id": 1,
+    "childId": "child-cfdd2047ed7b",
+    "userId": "user-13ccb6163551",
+    "timestamp": "2025-11-16T08:19:37.282339",
+    "date": "20251116",
+    "convDir": "conv_0001_081937",
+    "userQuery": "What is my name? Do you know my name?",
+    "harryResponse": "Mate, you're askin' about your name, are ya? Well, I've got some good news for you: you don't have a name, which is a right tricky business, innit? But, you do have a special name, which I reckon is... you, yeah? Just kidding! Seriously, though, I don't know your name, mate. What do you call yourself?",
+    "summary": "You're seeking to know your name, but are asking multiple questions about your own identity.",
+    "topics": [
+      "Ask about your name"
+    ],
+    "dominantEmotion": "Excited",
+    "sentimentScore": 85,
+    "engagementLevel": "high",
+    "questionCount": 1,
+    "breakthrough": false,
+    "needsAttention": false,
+    "keyPhrases": [
+      "ask about your name,",
+      "you're asking about your name"
+    ],
+    "analyzedAt": "2025-11-16T08:20:22.670711"
+  },
+  {
+    "id": 1,
+    "childId": "child-cfdd2047ed7b",
+    "userId": "user-13ccb6163551",
+    "timestamp": "2025-11-16T08:16:16.573577",
+    "date": "20251116",
+    "convDir": "conv_0001_081616",
+    "userQuery": "Can you tell me how life works? Thank you.",
+    "harryResponse": "Blimey, mate! Life's like a tricky path, you've got to navigate with care and quick thinking. It's not always easy, but it's worth it in the end. Just like how I had to figure out how to outsmart the Malfoirs, you'll learn to do the same when you're dealing with homework. Just remember, it's all about taking it one step at a time and being kind to yourself. You can do it, mate!",
+    "summary": "A neutral conversation about the meaning of life. It is a complex issue, and one must consider the importance of taking it one step at a time and being kind to oneself. Just like how one must learn to navigate through life. Just like how one must figure out how to outsmart the Malfoirs.",
+    "topics": [
+      "work",
+      "life",
+      "education"
+    ],
+    "dominantEmotion": "neutral",
+    "sentimentScore": 0,
+    "engagementLevel": "medium",
+    "questionCount": 1,
+    "breakthrough": false,
+    "needsAttention": false,
+    "keyPhrases": [
+      "life",
+      "work",
+      "education"
+    ],
+    "analyzedAt": "2025-11-16T08:16:58.353899"
+  },
+  {
+    "id": 1,
+    "childId": "child-cfdd2047ed7b",
+    "userId": "user-13ccb6163551",
     "timestamp": "2025-11-16T02:28:25.393599",
     "date": "20251116",
     "convDir": "conv_0001_022825",
@@ -25,8 +130,8 @@
   },
   {
     "id": 1,
-    "childId": "child-default",
-    "userId": "user-default",
+    "childId": "child-cfdd2047ed7b",
+    "userId": "user-13ccb6163551",
     "timestamp": "2025-11-16T02:03:29.293054",
     "date": "20251116",
     "convDir": "conv_0001_020329",
@@ -47,8 +152,8 @@
   },
   {
     "id": 1,
-    "childId": "child-default",
-    "userId": "user-default",
+    "childId": "child-cfdd2047ed7b",
+    "userId": "user-13ccb6163551",
     "timestamp": "2025-11-16T01:26:01.546546",
     "date": "20251116",
     "convDir": "conv_0001_012601",
@@ -69,8 +174,8 @@
   },
   {
     "id": 1,
-    "childId": "child-default",
-    "userId": "user-default",
+    "childId": "child-cfdd2047ed7b",
+    "userId": "user-13ccb6163551",
     "timestamp": "2025-11-15T22:24:21.524301",
     "date": "20251115",
     "convDir": "conv_0001_222421",
@@ -91,8 +196,8 @@
   },
   {
     "id": 1,
-    "childId": "child-default",
-    "userId": "user-default",
+    "childId": "child-cfdd2047ed7b",
+    "userId": "user-13ccb6163551",
     "timestamp": "2025-11-15T21:37:17.305843",
     "date": "20251115",
     "convDir": "conv_0001_213717",
@@ -113,8 +218,8 @@
   },
   {
     "id": 1,
-    "childId": "child-default",
-    "userId": "user-default",
+    "childId": "child-cfdd2047ed7b",
+    "userId": "user-13ccb6163551",
     "timestamp": "2025-11-16T05:52:15.098939",
     "date": "20251116",
     "convDir": "conv_0001_055215",
@@ -135,8 +240,8 @@
   },
   {
     "id": 1,
-    "childId": "child-default",
-    "userId": "user-default",
+    "childId": "child-cfdd2047ed7b",
+    "userId": "user-13ccb6163551",
     "timestamp": "2025-11-16T05:26:06.194892",
     "date": "20251116",
     "convDir": "conv_0001_052606",

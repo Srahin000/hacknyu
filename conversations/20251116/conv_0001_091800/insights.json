@@ -1,0 +1,22 @@
+{
+  "topics": [
+    "education",
+    "school",
+    "homework"
+  ],
+  "dominantEmotion": "Excited",
+  "sentimentScore": 85,
+  "summary": "The user is showing enthusiasm and eagerness to engage in discussions, particularly on topics like education and homework.",
+  "keyPhrases": [
+    "interested in school"
+  ],
+  "engagementLevel": "high",
+  "questionCount": 1,
+  "breakthrough": false,
+  "needsAttention": false,
+  "analyzedAt": "2025-11-16T09:18:35.456483",
+  "analysisLatencyMs": 35184,
+  "conversationId": 1,
+  "userId": "user-13ccb6163551",
+  "childId": "child-cfdd2047ed7b"
+}

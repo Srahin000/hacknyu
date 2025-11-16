@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2025-11-16T07:00:45.691506",
+  "generatedAt": "2025-11-16T08:55:35.974853",
   "summary": {
-    "totalConversations": 7,
-    "totalQuestions": 1,
-    "totalBreakthroughs": 0,
-    "attentionNeeded": 0,
-    "avgSentiment": 46.3
+    "totalConversations": 11,
+    "totalQuestions": 4,
+    "totalBreakthroughs": 1,
+    "attentionNeeded": 1,
+    "avgSentiment": 44.9
   },
   "topics": {
     "topTopics": [
@@ -16,24 +16,60 @@
       {
         "name": "Homework",
         "count": 1
+      },
+      {
+        "name": "work",
+        "count": 1
+      },
+      {
+        "name": "life",
+        "count": 1
+      },
+      {
+        "name": "education",
+        "count": 1
+      },
+      {
+        "name": "Ask about your name",
+        "count": 1
+      },
+      {
+        "name": "question",
+        "count": 1
+      },
+      {
+        "name": "topic",
+        "count": 1
+      },
+      {
+        "name": "homework",
+        "count": 1
+      },
+      {
+        "name": "school",
+        "count": 1
       }
     ],
-    "totalUniqueTopics": 2
+    "totalUniqueTopics": 10
   },
   "emotions": {
     "distribution": {
       "Neutral": 6,
-      "Frustrated": 1
+      "Frustrated": 1,
+      "neutral": 1,
+      "Excited": 2,
+      "Unknown": 1
     },
     "mostCommon": "Neutral"
   },
   "engagement": {
     "distribution": {
-      "medium": 6,
-      "low": 1
+      "medium": 8,
+      "low": 1,
+      "high": 2
     },
-    "high": 0,
-    "medium": 6,
+    "high": 2,
+    "medium": 8,
     "low": 1
   },
   "timeline": [
@@ -46,13 +82,69 @@
     },
     {
       "date": "20251116",
-      "conversations": 5,
-      "avgSentiment": 44.8,
-      "breakthroughs": 0,
-      "topicsCount": 2
+      "conversations": 9,
+      "avgSentiment": 43.8,
+      "breakthroughs": 1,
+      "topicsCount": 10
     }
   ],
   "recentConversations": [
+    {
+      "id": 1,
+      "date": "20251116",
+      "userQuery": "What is your dad's name?",
+      "topics": [
+        "question",
+        "topic"
+      ],
+      "emotion": "Unknown",
+      "sentiment": 0,
+      "engagement": "medium",
+      "breakthrough": true,
+      "summary": "No clear sentiment detected, summary: No summary given."
+    },
+    {
+      "id": 2,
+      "date": "20251116",
+      "userQuery": "Do you think I need some help?",
+      "topics": [
+        "homework",
+        "school"
+      ],
+      "emotion": "Excited",
+      "sentiment": 85,
+      "engagement": "high",
+      "breakthrough": false,
+      "summary": "You're feeling more motivated and engaged now that we've started discussing your goals. This is a positive direction, and I'm happy to be a part of it."
+    },
+    {
+      "id": 1,
+      "date": "20251116",
+      "userQuery": "What is my name? Do you know my name?",
+      "topics": [
+        "Ask about your name"
+      ],
+      "emotion": "Excited",
+      "sentiment": 85,
+      "engagement": "high",
+      "breakthrough": false,
+      "summary": "You're seeking to know your name, but are asking multiple questions about your own identity."
+    },
+    {
+      "id": 1,
+      "date": "20251116",
+      "userQuery": "Can you tell me how life works? Thank you.",
+      "topics": [
+        "work",
+        "life",
+        "education"
+      ],
+      "emotion": "neutral",
+      "sentiment": 0,
+      "engagement": "medium",
+      "breakthrough": false,
+      "summary": "A neutral conversation about the meaning of life. It is a complex issue, and one must consider the importance of taking it one step at a time and being kind to oneself. Just like how one must learn to"
+    },
     {
       "id": 1,
       "date": "20251116",
@@ -65,69 +157,53 @@
       "engagement": "low",
       "breakthrough": false,
       "summary": "I don't know how to do my homework. Can you help me please. It seems like a lot of work to do my Transfiguration homework."
-    },
-    {
-      "id": 1,
-      "date": "20251116",
-      "userQuery": "Hello my name is Abadraken, I don't know what to talk about.",
-      "topics": [
-        "general conversation"
-      ],
-      "emotion": "Neutral",
-      "sentiment": 50,
-      "engagement": "medium",
-      "breakthrough": false,
-      "summary": "Conversation with Harry Potter assistant."
-    },
-    {
-      "id": 1,
-      "date": "20251116",
-      "userQuery": "I'm a bit scared. I need to figure out how to make this run and it's not running.",
-      "topics": [
-        "general conversation"
-      ],
-      "emotion": "Neutral",
-      "sentiment": 50,
-      "engagement": "medium",
-      "breakthrough": false,
-      "summary": "Conversation with Harry Potter assistant."
-    },
-    {
-      "id": 1,
-      "date": "20251115",
-      "userQuery": "I love McDonald's. Do you like McDonald's?",
-      "topics": [
-        "general conversation"
-      ],
-      "emotion": "Neutral",
-      "sentiment": 50,
-      "engagement": "medium",
-      "breakthrough": false,
-      "summary": "Conversation with Harry Potter assistant."
-    },
-    {
-      "id": 1,
-      "date": "20251115",
-      "userQuery": "Do you know what photosynthesis is? I really want to know about it.",
-      "topics": [
-        "general conversation"
-      ],
-      "emotion": "Neutral",
-      "sentiment": 50,
-      "engagement": "medium",
-      "breakthrough": false,
-      "summary": "Conversation with Harry Potter assistant."
     }
   ],
   "keyPhrases": [
     {
       "phrase": "I don't know how to do my homework.",
       "count": 1
+    },
+    {
+      "phrase": "life",
+      "count": 1
+    },
+    {
+      "phrase": "work",
+      "count": 1
+    },
+    {
+      "phrase": "education",
+      "count": 1
+    },
+    {
+      "phrase": "ask about your name,",
+      "count": 1
+    },
+    {
+      "phrase": "you're asking about your name",
+      "count": 1
+    },
+    {
+      "phrase": "Blimey",
+      "count": 1
+    },
+    {
+      "phrase": "love",
+      "count": 1
+    },
+    {
+      "phrase": "You're feeling more motivated",
+      "count": 1
+    },
+    {
+      "phrase": "You're feeling engaged",
+      "count": 1
     }
   ],
   "insights": {
-    "breakthroughRate": 0.0,
-    "avgQuestionsPerConversation": 0.1,
-    "attentionRate": 0.0
+    "breakthroughRate": 9.1,
+    "avgQuestionsPerConversation": 0.4,
+    "attentionRate": 9.1
   }
 }

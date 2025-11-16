@@ -343,6 +343,82 @@ def cleanup_on_shutdown():
     print("[Shutdown] Cleanup complete.")
 
 
+# Profile Management Endpoints
+@app.get("/api/profiles/children")
+async def get_all_children():
+    """Get all children profiles"""
+    try:
+        from user_child_manager import UserChildManager
+        manager = UserChildManager()
+        
+        # Get all users and their children
+        all_children = []
+        for user in manager.get_all_users():
+            children = manager.get_children_for_user(user["userId"])
+            all_children.extend(children)
+        
+        return all_children
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get children: {str(e)}")
+
+
+@app.get("/api/profiles/current-child")
+async def get_current_child():
+    """Get currently selected child"""
+    try:
+        from user_child_manager import UserChildManager
+        manager = UserChildManager()
+        child = manager.get_current_child()
+        
+        if not child:
+            return None
+        
+        return child
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get current child: {str(e)}")
+
+
+class SetChildRequest(BaseModel):
+    childId: str
+
+
+@app.post("/api/profiles/current-child")
+async def set_current_child(request: SetChildRequest):
+    """Set currently selected child"""
+    try:
+        from user_child_manager import UserChildManager
+        manager = UserChildManager()
+        manager.set_current_child(request.childId)
+        
+        return {"success": True, "childId": request.childId}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to set current child: {str(e)}")
+
+
+class CreateChildRequest(BaseModel):
+    name: str
+    age: int
+
+
+@app.post("/api/profiles/children")
+async def create_child(request: CreateChildRequest):
+    """Create a new child profile"""
+    try:
+        from user_child_manager import UserChildManager
+        manager = UserChildManager()
+        
+        # Ensure default user exists
+        user, _ = manager.ensure_default_setup()
+        
+        # Create child under current user
+        child = manager.create_child(user["userId"], request.name, request.age)
+        manager.set_current_child(child["childId"])
+        
+        return child
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to create child: {str(e)}")
+
+
 if __name__ == "__main__":
     # Register signal handlers for graceful shutdown
     def signal_handler(sig, frame):
