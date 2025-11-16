@@ -1,0 +1,16 @@
+{
+  "conversation_id": 1,
+  "timestamp": "2025-11-16T08:19:37.282339",
+  "date": "20251116",
+  "time": "081937",
+  "user_query": "What is my name? Do you know my name?",
+  "harry_response": "Mate, you're askin' about your name, are ya? Well, I've got some good news for you: you don't have a name, which is a right tricky business, innit? But, you do have a special name, which I reckon is... you, yeah? Just kidding! Seriously, though, I don't know your name, mate. What do you call yourself?",
+  "sample_rate": 16000,
+  "audio_duration_seconds": 8.0,
+  "stt_type": "whisper-npu",
+  "tts_type": "pyttsx3",
+  "emotion_type": "none",
+  "wake_word_type": "picovoice",
+  "userId": "user-13ccb6163551",
+  "childId": "child-cfdd2047ed7b"
+}

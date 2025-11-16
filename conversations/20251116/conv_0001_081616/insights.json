@@ -1,0 +1,22 @@
+{
+  "topics": [
+    "work",
+    "life",
+    "education"
+  ],
+  "dominantEmotion": "neutral",
+  "sentimentScore": 0,
+  "summary": "A neutral conversation about the meaning of life. It is a complex issue, and one must consider the importance of taking it one step at a time and being kind to oneself. Just like how one must learn to navigate through life. Just like how one must figure out how to outsmart the Malfoirs.",
+  "keyPhrases": [
+    "life",
+    "work",
+    "education"
+  ],
+  "engagementLevel": "medium",
+  "questionCount": 1,
+  "analyzedAt": "2025-11-16T08:16:58.353899",
+  "analysisLatencyMs": 41742,
+  "conversationId": 1,
+  "userId": "user-13ccb6163551",
+  "childId": "child-cfdd2047ed7b"
+}

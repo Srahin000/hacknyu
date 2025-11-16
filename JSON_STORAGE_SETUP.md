@@ -99,3 +99,4 @@ For the demo, authentication uses localStorage:
 - No server-side auth required
 - Simple and works for demo purposes
 
+

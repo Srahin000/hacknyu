@@ -22,3 +22,8 @@ TTS>=0.22.0  # Coqui TTS (offline, high quality)
 
 # Audio processing
 librosa>=0.10.0  # Audio loading and processing
+
+# Web server for voice assistant control
+fastapi>=0.104.0
+uvicorn>=0.24.0
+websockets>=12.0  # For WebSocket server in voice assistant

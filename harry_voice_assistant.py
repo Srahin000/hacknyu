@@ -21,6 +21,9 @@ import numpy as np
 import sounddevice as sd
 import soundfile as sf
 from pathlib import Path
+import asyncio
+from threading import Thread
+from typing import Set, Optional
 
 # Fix Windows console encoding
 if sys.platform == 'win32':
@@ -34,6 +37,147 @@ if sys.platform == 'win32':
     except (AttributeError, ValueError):
         # If wrapping fails, just continue with the default stdout/stderr
         pass
+
+
+class WebSocketServer:
+    """WebSocket server for broadcasting avatar state changes"""
+    
+    def __init__(self, port: int = 8765):
+        self.port = port
+        self.clients: Set = set()
+        self.server = None
+        self.server_thread: Optional[Thread] = None
+        self.running = False
+        self.loop: Optional[asyncio.AbstractEventLoop] = None
+        
+    async def register_client(self, websocket):
+        """Register a new WebSocket client"""
+        self.clients.add(websocket)
+        print(f"[WebSocket] Client connected. Total clients: {len(self.clients)}")
+        # Send initial idle state
+        await self.broadcast_state('idle')
+        
+    async def unregister_client(self, websocket):
+        """Unregister a WebSocket client"""
+        self.clients.discard(websocket)
+        print(f"[WebSocket] Client disconnected. Total clients: {len(self.clients)}")
+    
+    async def broadcast(self, message: dict):
+        """Broadcast message to all connected clients"""
+        if not self.clients:
+            return
+        
+        message_str = json.dumps(message)
+        disconnected = set()
+        
+        for client in self.clients:
+            try:
+                await client.send(message_str)
+            except Exception as e:
+                print(f"[WebSocket] Error sending to client: {e}")
+                disconnected.add(client)
+        
+        # Remove disconnected clients
+        for client in disconnected:
+            self.clients.discard(client)
+    
+    async def broadcast_state(self, state: str):
+        """Broadcast avatar state change"""
+        # Map internal states to avatar states
+        avatar_state = state
+        if state == 'generating':
+            # Generating is not an avatar animation state, but we still broadcast it
+            # The webapp will show it in the status indicator
+            avatar_state = 'idle'  # Avatar stays idle while generating
+        elif state not in ['idle', 'listening', 'talking']:
+            avatar_state = 'idle'  # Default to idle for unknown states
+        
+        await self.broadcast({
+            'type': 'state',
+            'state': avatar_state,
+            'internal_state': state  # Include internal state for status tracking
+        })
+    
+    async def broadcast_audio(self, audio_url: str):
+        """Broadcast audio file URL"""
+        await self.broadcast({
+            'type': 'audio',
+            'url': audio_url
+        })
+    
+    async def handler(self, websocket):
+        """Handle WebSocket connections"""
+        await self.register_client(websocket)
+        try:
+            # Keep connection alive
+            async for message in websocket:
+                # Echo back or handle client messages if needed
+                pass
+        except Exception as e:
+            print(f"[WebSocket] Connection error: {e}")
+        finally:
+            await self.unregister_client(websocket)
+    
+    async def start_server(self):
+        """Start the WebSocket server"""
+        try:
+            import websockets
+            print(f"[WebSocket] Creating server on localhost:{self.port}...")
+            self.loop = asyncio.get_event_loop()
+            self.server = await websockets.serve(
+                self.handler,
+                "localhost",
+                self.port
+            )
+            self.running = True
+            print(f"[WebSocket] ✅ Server started successfully on ws://localhost:{self.port}")
+            print(f"[WebSocket] Server is ready to accept connections")
+            await asyncio.Future()  # Run forever
+        except OSError as e:
+            if "Address already in use" in str(e) or "Only one usage of each socket address" in str(e):
+                print(f"[WebSocket] ⚠️  Port {self.port} is already in use. Trying to continue...")
+                self.running = False
+            else:
+                import traceback
+                print(f"[WebSocket] ❌ Failed to start server: {e}")
+                print(traceback.format_exc())
+                self.running = False
+        except Exception as e:
+            import traceback
+            print(f"[WebSocket] ❌ Failed to start server: {e}")
+            print(traceback.format_exc())
+            self.running = False
+    
+    def start(self):
+        """Start WebSocket server in background thread"""
+        try:
+            self.server_thread = Thread(target=self._run_server, daemon=True)
+            self.server_thread.start()
+            # Give it a moment to start
+            time.sleep(0.5)
+        except Exception as e:
+            print(f"[WebSocket] Failed to start server thread: {e}")
+    
+    def _run_server(self):
+        """Run the asyncio server in a thread"""
+        try:
+            # Create new event loop for this thread
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            self.loop = loop
+            print(f"[WebSocket] Starting server thread on port {self.port}...")
+            loop.run_until_complete(self.start_server())
+        except Exception as e:
+            import traceback
+            error_msg = f"[WebSocket] Server thread error: {e}\n{traceback.format_exc()}"
+            print(error_msg)
+            self.running = False
+    
+    def stop(self):
+        """Stop the WebSocket server"""
+        self.running = False
+        if self.server:
+            self.server.close()
 
 
 class HarryVoiceAssistant:
@@ -76,6 +220,10 @@ class HarryVoiceAssistant:
         self.audio_dir.mkdir(exist_ok=True)
         
         self.conversation_count = 0
+        
+        # WebSocket server for avatar communication (will be initialized AFTER models load)
+        self.websocket_server: Optional[WebSocketServer] = None
+        self.current_avatar_state = 'idle'
         
         # Context manager (reads insights)
         self.context_manager = None
@@ -134,6 +282,23 @@ class HarryVoiceAssistant:
         if not all([self.wake_word_ready, self.stt_ready, self.llm_ready, self.tts_ready]):
             print("\n❌ Not all critical components ready!")
             sys.exit(1)
+        
+        # NOW start WebSocket server (after PyTorch/models loaded to avoid threading conflicts)
+        try:
+            print("\n🌐 Starting WebSocket server for avatar communication...")
+            self.websocket_server = WebSocketServer(port=8765)
+            self.websocket_server.start()
+            # Give it time to bind to the port
+            time.sleep(1.5)
+            # Check if server is actually running
+            if self.websocket_server.running:
+                print("  ✅ WebSocket server ready on ws://localhost:8765")
+            else:
+                print("  ⚠️  WebSocket server may not be running properly")
+        except Exception as e:
+            import traceback
+            print(f"  ⚠️  WebSocket server failed (avatar features disabled): {e}")
+            self.websocket_server = None
         
         print("\n" + "="*70)
         print("✅ ALL SYSTEMS READY!".center(70))
@@ -245,18 +410,27 @@ class HarryVoiceAssistant:
         """Initialize Emotion Detection (NPU or skip)"""
         print("😊 [4/5] Initializing Emotion Detection...")
         
-        try:
-            from emotion_npu import EmotionNPU
-            self.emotion_detector = EmotionNPU()
-            self.emotion_type = self.emotion_detector.inference_type
-            self.emotion_ready = True
-            print(f"  ✅ Emotion detection ready ({self.emotion_type})")
-        except Exception as e:
-            print(f"  ⚠️  Emotion detection not available: {e}")
-            print("     Continuing without emotion detection...")
-            self.emotion_detector = None
-            self.emotion_type = "none"
-            self.emotion_ready = False
+        # DISABLED FOR HACKATHON SPEED - emotion model is slow to load
+        print("  ⚠️  Emotion detection disabled (for faster startup)")
+        print("     Enable by uncommenting code in _init_emotion()")
+        self.emotion_detector = None
+        self.emotion_type = "none"
+        self.emotion_ready = False
+        return
+        
+        # Uncomment below to enable emotion detection:
+        # try:
+        #     from emotion_npu import EmotionNPU
+        #     self.emotion_detector = EmotionNPU()
+        #     self.emotion_type = self.emotion_detector.inference_type
+        #     self.emotion_ready = True
+        #     print(f"  ✅ Emotion detection ready ({self.emotion_type})")
+        # except Exception as e:
+        #     print(f"  ⚠️  Emotion detection not available: {e}")
+        #     print("     Continuing without emotion detection...")
+        #     self.emotion_detector = None
+        #     self.emotion_type = "none"
+        #     self.emotion_ready = False
     
     def _init_tts(self):
         """Initialize Text-to-Speech (pyttsx3 for now)"""
@@ -526,25 +700,98 @@ class HarryVoiceAssistant:
             return None
     
     def speak(self, text, conversation_id=None, conv_dir=None):
-        """Speak text using pyttsx3"""
+        """Speak text using pyttsx3 and broadcast to avatar"""
         
         print(f"🔊 Harry speaks: \"{text}\"")
         
+        # Broadcast talking state
+        self._broadcast_state('talking')
+        
         if not self.tts_ready:
+            self._broadcast_state('idle')
             return None
         
         try:
             if self.tts_type == "pyttsx3":
-                self.tts_engine.say(text)
+                # Save audio to file for avatar playback
+                audio_path = None
+                if conversation_id and conv_dir:
+                    audio_path = conv_dir / "harry_response.wav"
+                else:
+                    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                    audio_path = self.audio_dir / f"harry_{timestamp}.wav"
+                
+                # Generate audio file
+                self.tts_engine.save_to_file(text, str(audio_path))
                 self.tts_engine.runAndWait()
-                return None
+                
+                # Wait for file to be written
+                time.sleep(0.2)
+                
+                # Broadcast audio URL (relative path for webapp)
+                if audio_path.exists():
+                    # Copy to webapp public directory for serving
+                    webapp_audio_dir = Path("EDGEucatorWebApp/public/audio")
+                    webapp_audio_dir.mkdir(parents=True, exist_ok=True)
+                    webapp_audio_path = webapp_audio_dir / audio_path.name
+                    
+                    try:
+                        import shutil
+                        shutil.copy2(audio_path, webapp_audio_path)
+                        # Use webapp-relative path
+                        audio_url = f"/audio/{audio_path.name}"
+                    except Exception as e:
+                        print(f"[WebSocket] Failed to copy audio to webapp: {e}")
+                        # Fallback: use original path (may not work if not accessible)
+                        audio_url = f"/audio/{audio_path.name}" if audio_path.parent.name == "audio" else f"/audio/{audio_path.name}"
+                    
+                    self._broadcast_audio(audio_url)
+                
+                # Broadcast idle state when done
+                self._broadcast_state('idle')
+                return audio_path
             
         except Exception as e:
             print(f"❌ TTS error: {e}")
+            self._broadcast_state('idle')
             return None
+    
+    def _broadcast_state(self, state: str):
+        """Broadcast avatar state change (thread-safe)"""
+        if self.websocket_server and state != self.current_avatar_state:
+            self.current_avatar_state = state
+            try:
+                # Use thread-safe method to schedule coroutine in server's event loop
+                if self.websocket_server.loop and self.websocket_server.loop.is_running():
+                    asyncio.run_coroutine_threadsafe(
+                        self.websocket_server.broadcast_state(state),
+                        self.websocket_server.loop
+                    )
+                else:
+                    # Fallback: create new event loop for this call
+                    asyncio.run(self.websocket_server.broadcast_state(state))
+            except Exception as e:
+                print(f"[WebSocket] Failed to broadcast state: {e}")
+    
+    def _broadcast_audio(self, audio_url: str):
+        """Broadcast audio URL (thread-safe)"""
+        if self.websocket_server:
+            try:
+                if self.websocket_server.loop and self.websocket_server.loop.is_running():
+                    asyncio.run_coroutine_threadsafe(
+                        self.websocket_server.broadcast_audio(audio_url),
+                        self.websocket_server.loop
+                    )
+                else:
+                    asyncio.run(self.websocket_server.broadcast_audio(audio_url))
+            except Exception as e:
+                print(f"[WebSocket] Failed to broadcast audio: {e}")
     
     def run(self):
         """Run the voice assistant loop"""
+        
+        # Broadcast initial idle state
+        self._broadcast_state('idle')
         
         print("\n" + "="*70)
         print(" 🎯 VOICE ASSISTANT READY ".center(70))
@@ -582,6 +829,9 @@ class HarryVoiceAssistant:
                     print(f"\r✨ WAKE WORD DETECTED! (#{conversation_count})")
                     print("=" * 70)
                     
+                    # Broadcast listening state
+                    self._broadcast_state('listening')
+                    
                     # Brief pause
                     time.sleep(0.3)
                     
@@ -604,10 +854,13 @@ class HarryVoiceAssistant:
                     print()
                     
                     # 5. Get LLM response
+                    # Broadcast generating state before LLM processing
+                    self._broadcast_state('generating')
                     response = self.get_harry_response(transcription)
                     
                     if not response:
                         print("⚠️  Harry couldn't respond. Try again!")
+                        self._broadcast_state('idle')  # Return to idle on error
                         continue
                     
                     print()
@@ -627,6 +880,9 @@ class HarryVoiceAssistant:
                     print("="*70)
                     print()
                     
+                    # Return to idle state after conversation
+                    self._broadcast_state('idle')
+                    
         except KeyboardInterrupt:
             print("\n\n⚡ Shutting down Harry Potter Voice Assistant...")
             print(f"   Total conversations: {conversation_count}")
@@ -634,6 +890,9 @@ class HarryVoiceAssistant:
         
         finally:
             # Cleanup
+            self._broadcast_state('idle')
+            if self.websocket_server:
+                self.websocket_server.stop()
             try:
                 self.porcupine.delete()
             except:
@@ -641,6 +900,9 @@ class HarryVoiceAssistant:
     
     def test_mode(self):
         """Test mode - skip wake word, use keyboard input"""
+        
+        # Broadcast initial idle state
+        self._broadcast_state('idle')
         
         print("\n" + "="*70)
         print(" 🧪 TEST MODE - Voice Pipeline Test ".center(70))
@@ -662,6 +924,9 @@ class HarryVoiceAssistant:
                 
                 conversation_count += 1
                 
+                # Broadcast listening state
+                self._broadcast_state('listening')
+                
                 # Record
                 audio, sample_rate = self.record_audio(duration=6)
                 
@@ -678,6 +943,8 @@ class HarryVoiceAssistant:
                 print(f"\n💬 You said: \"{transcription}\"")
                 
                 # Get response
+                # Broadcast generating state before LLM processing
+                self._broadcast_state('generating')
                 response = self.get_harry_response(transcription)
                 
                 if response:
@@ -692,10 +959,14 @@ class HarryVoiceAssistant:
                     print()
                     self.speak(response, conversation_count, conv_dir)
                 
+                # Return to idle after conversation
+                self._broadcast_state('idle')
+                
                 print("\n" + "="*70 + "\n")
                 
         except KeyboardInterrupt:
             print("\n\n⚡ Test mode ended.\n")
+            self._broadcast_state('idle')
 
 
 def main():

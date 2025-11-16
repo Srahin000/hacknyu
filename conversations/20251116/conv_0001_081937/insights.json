@@ -1,0 +1,24 @@
+{
+  "topics": [
+    "Ask about your name"
+  ],
+  "dominantEmotion": "Excited",
+  "sentimentScore": 85,
+  "summary": "You're seeking to know your name, but are asking multiple questions about your own identity.",
+  "keyPhrases": [
+    "ask about your name,",
+    "you're asking about your name"
+  ],
+  "engagementLevel": "high",
+  "questionCount": 1,
+  "breakthrough": false,
+  "needsAttention": false,
+  "conversation": {
+    "duration": 8.0
+  },
+  "analyzedAt": "2025-11-16T08:20:22.670711",
+  "analysisLatencyMs": 45352,
+  "conversationId": 1,
+  "userId": "user-13ccb6163551",
+  "childId": "child-cfdd2047ed7b"
+}

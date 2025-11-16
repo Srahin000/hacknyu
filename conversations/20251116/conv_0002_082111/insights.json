@@ -1,0 +1,19 @@
+{
+  "topics": [
+    "homework",
+    "school"
+  ],
+  "dominantEmotion": "Excited",
+  "sentimentScore": 85,
+  "summary": "You're feeling more motivated and engaged now that we've started discussing your goals. This is a positive direction, and I'm happy to be a part of it.",
+  "keyPhrases": [
+    "You're feeling more motivated",
+    "You're feeling engaged"
+  ],
+  "engagementLevel": "high",
+  "analyzedAt": "2025-11-16T08:21:47.280303",
+  "analysisLatencyMs": 36173,
+  "conversationId": 2,
+  "userId": "user-13ccb6163551",
+  "childId": "child-cfdd2047ed7b"
+}
