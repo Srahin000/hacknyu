@@ -1,0 +1,15 @@
+{
+  "conversation_id": 1,
+  "timestamp": "2025-11-15T21:37:17.305843",
+  "date": "20251115",
+  "time": "213717",
+  "user_query": "Do you know what photosynthesis is? I really want to know about it.",
+  "harry_response": "It's actually plants that can do photosynthesis, like the ones in the Hogwarts garden, but I think you might be thinking of the way plants make their own food, like I do, by using sunlight, water, and carbon dioxide.",
+  "audio_file": "20251115\\conv_0001_213717\\audio.wav",
+  "transcript_file": "20251115\\conv_0001_213717\\transcript.txt",
+  "sample_rate": 16000,
+  "audio_duration_seconds": 8.0,
+  "stt_type": "whisper-npu",
+  "tts_type": "pyttsx3",
+  "wake_word_type": "picovoice"
+}
