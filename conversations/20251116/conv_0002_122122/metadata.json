@@ -1,0 +1,16 @@
+{
+  "conversation_id": 2,
+  "timestamp": "2025-11-16T12:21:22.662483",
+  "date": "20251116",
+  "time": "122122",
+  "user_query": "Can you tell me more about how you made your mom and your dad?",
+  "harry_response": "\"Blimey, that's a great question! So, Mum and Dad were both born to my mother, Lily, and my father James. They were really close, and I'm sure they're both beaming with pride whenever they think of me. Do you know what kind of magic they used to make, mate?\"",
+  "sample_rate": 16000,
+  "audio_duration_seconds": 8.0,
+  "stt_type": "whisper-npu",
+  "tts_type": "pyttsx3",
+  "emotion_type": "none",
+  "wake_word_type": "picovoice",
+  "userId": "user-13ccb6163551",
+  "childId": "child-cfdd2047ed7b"
+}

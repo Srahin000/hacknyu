@@ -1,0 +1,16 @@
+{
+  "conversation_id": 1,
+  "timestamp": "2025-11-16T12:06:50.553762",
+  "date": "20251116",
+  "time": "120650",
+  "user_query": "Photosynthesis and basketball. Tell me about how photosynthesis works.",
+  "harry_response": "\"Blimey, photosynthesis is a right fascinating subject, mate! It's like, plants and crops use it to make glucose and oxygen, all without having a brain or a heart, it's just a natural process, innit? Have you ever tried growing a plant and then using a flashlight to shine on it? It's like a mini light show, really cool!\"",
+  "sample_rate": 16000,
+  "audio_duration_seconds": 8.0,
+  "stt_type": "whisper-npu",
+  "tts_type": "pyttsx3",
+  "emotion_type": "none",
+  "wake_word_type": "picovoice",
+  "userId": "user-13ccb6163551",
+  "childId": "child-cfdd2047ed7b"
+}

@@ -17,13 +17,13 @@ from typing import List, Dict, Optional
 class ContextManager:
     """Manages conversation context and insights for Harry"""
     
-    def __init__(self, conversations_root: Path = Path("conversations"), max_context_conversations: int = 5):
+    def __init__(self, conversations_root: Path = Path("conversations"), max_context_conversations: int = 2):
         """
         Initialize context manager
         
         Args:
             conversations_root: Root directory for conversations
-            max_context_conversations: Max number of recent conversations to include in context
+            max_context_conversations: Max number of recent conversations to include in context (kept small for speed)
         """
         self.conversations_root = conversations_root
         self.max_context = max_context_conversations
@@ -210,57 +210,37 @@ class ContextManager:
     
     def build_context_for_harry(self) -> str:
         """
-        Build context string to prepend to Harry's prompt
+        Build MINIMAL context string to prepend to Harry's prompt
         
         Returns:
-            Context string with relevant information
+            Context string with relevant information (kept short for speed)
         """
-        insights = self.load_recent_insights(limit=3)
+        insights = self.load_recent_insights(limit=2)
         
         if not insights:
             return ""
         
-        # Build context summary
-        topics = self.get_topic_history(limit=5)
-        emotional = self.get_emotional_trend()
-        learning = self.get_learning_context()
-        
         context_parts = []
         
-        # Recent conversation context
-        if insights:
-            most_recent = insights[0]
-            context_parts.append(f"Last conversation: {most_recent.get('summary', 'N/A')}")
+        # Only include most recent conversation if relevant
+        most_recent = insights[0]
+        recent_topics = most_recent.get('topics', [])
+        if recent_topics:
+            context_parts.append(f"Last talked about: {', '.join(recent_topics[:2])}")
         
-        # Topics
-        if topics:
-            context_parts.append(f"Recent topics: {', '.join(topics[:5])}")
+        # Only include emotional context if concerning
+        emotional = self.get_emotional_trend()
+        if emotional['trend'] == 'declining':
+            context_parts.append(f"Note: seems a bit down lately")
         
-        # Emotional state
-        emotion_desc = emotional['dominantEmotion']
-        if emotional['trend'] == 'improving':
-            emotion_desc += " (mood improving)"
-        elif emotional['trend'] == 'declining':
-            emotion_desc += " (seems down lately)"
-        
-        context_parts.append(f"Emotional state: {emotion_desc}")
-        
-        # Learning context
+        # Only include high-interest topics
+        learning = self.get_learning_context()
         if learning['highInterestTopics']:
-            context_parts.append(f"Interests: {', '.join(learning['highInterestTopics'][:3])}")
+            context_parts.append(f"Loves: {', '.join(learning['highInterestTopics'][:2])}")
         
-        if learning['strugglingWith']:
-            context_parts.append(f"Struggling with: {', '.join(learning['strugglingWith'][:2])}")
-        
-        if learning['recentBreakthroughs']:
-            bt = learning['recentBreakthroughs'][0]
-            context_parts.append(f"Recent breakthrough: {bt['topic']}")
-        
-        # Build final context
+        # Build minimal context
         if context_parts:
-            context = "CONTEXT FROM PREVIOUS CONVERSATIONS:\n"
-            context += "\n".join(f"- {part}" for part in context_parts)
-            context += "\n\nUse this context to personalize your response and build on previous discussions.\n\n"
+            context = "[Context: " + "; ".join(context_parts) + "]\n\n"
             return context
         
         return ""

@@ -1,0 +1,18 @@
+{
+  "topics": [
+    "general conversation"
+  ],
+  "dominantEmotion": "Neutral",
+  "sentimentScore": 50,
+  "summary": "Conversation with Harry Potter assistant.",
+  "keyPhrases": [],
+  "engagementLevel": "medium",
+  "questionCount": 0,
+  "breakthrough": false,
+  "needsAttention": false,
+  "analyzedAt": "2025-11-16T11:48:49.156580",
+  "analysisLatencyMs": 15995,
+  "conversationId": 1,
+  "userId": "user-13ccb6163551",
+  "childId": "child-cfdd2047ed7b"
+}

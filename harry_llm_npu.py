@@ -15,9 +15,11 @@ class HarryPotterNPU:
         if not self.genie_exe.exists():
             raise FileNotFoundError(f"Genie exe not found: {self.genie_exe}")
         
-        # Harry Potter character prompt - ULTRA SHORT for fast responses
-        self.system_prompt = """You are Harry Potter. Keep responses VERY brief (1 sentence max). 
-Use British words like "mate", "brilliant", "blimey". Be encouraging and friendly."""
+        # Harry Potter character prompt - Natural and conversational
+        self.system_prompt = """You are Harry Potter talking to a young student. Be warm, curious, and encouraging. 
+Keep responses natural and conversational (2-3 short sentences max). 
+Use British expressions like "mate", "brilliant", "blimey". Ask follow-up questions to keep the conversation going.
+Be genuine and show interest in what they're saying."""
     
     def ask_harry(self, question, system_prompt=None):
         """
@@ -47,7 +49,7 @@ Use British words like "mate", "brilliant", "blimey". Be encouraging and friendl
                 cwd=str(self.bundle_dir),
                 capture_output=True,
                 text=True,
-                timeout=60  # Increased timeout for analysis tasks
+                timeout=15  # Reduced timeout for faster responses (was 60)
             )
             
             latency = int((time.time() - start) * 1000)

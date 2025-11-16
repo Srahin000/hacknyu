@@ -1,0 +1,16 @@
+{
+  "conversation_id": 2,
+  "timestamp": "2025-11-16T11:08:16.856078",
+  "date": "20251116",
+  "time": "110816",
+  "user_query": "to sort of feed like a wee views outside how you put our rose samples to train it and make it like similar bait",
+  "harry_response": "Sorry mate, I'm thinking too slowly. Try again?",
+  "sample_rate": 16000,
+  "audio_duration_seconds": 8.0,
+  "stt_type": "whisper-npu",
+  "tts_type": "pyttsx3",
+  "emotion_type": "none",
+  "wake_word_type": "picovoice",
+  "userId": "user-13ccb6163551",
+  "childId": "child-cfdd2047ed7b"
+}

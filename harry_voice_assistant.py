@@ -183,12 +183,12 @@ class WebSocketServer:
 class HarryVoiceAssistant:
     """Complete voice assistant for Harry Potter"""
     
-    def __init__(self, enable_context=True, enable_insights=True):
+    def __init__(self, enable_context=False, enable_insights=True):
         """
         Initialize all components
         
         Args:
-            enable_context: Enable conversation context (loads insights from previous conversations)
+            enable_context: Enable conversation context (DEFAULT: False for faster responses)
             enable_insights: Enable automatic insight generation after each conversation
         """
         
@@ -225,7 +225,7 @@ class HarryVoiceAssistant:
         self.websocket_server: Optional[WebSocketServer] = None
         self.current_avatar_state = 'idle'
         
-        # Context manager (reads insights)
+        # Context manager (reads insights) - DISABLED BY DEFAULT FOR SPEED
         self.context_manager = None
         if self.enable_context:
             try:
@@ -235,6 +235,8 @@ class HarryVoiceAssistant:
             except Exception as e:
                 print(f"⚠️  Context system disabled: {e}")
                 self.enable_context = False
+        else:
+            print("⚡ Context disabled for maximum speed")
         
         # User/Child management
         self.user_manager = None
@@ -257,7 +259,7 @@ class HarryVoiceAssistant:
             try:
                 from conversation_analyzer import ConversationAnalyzer
                 self.analyzer = ConversationAnalyzer(cpu_mode=False)  # Use NPU for analysis
-                print("🔍 Insight generation enabled (analyzes conversations in background)")
+                print("🔍 Insight generation enabled (runs in background, doesn't block conversations)")
             except Exception as e:
                 print(f"⚠️  Insight generation disabled: {e}")
                 self.enable_insights = False
@@ -674,24 +676,13 @@ class HarryVoiceAssistant:
             return None
     
     def get_harry_response(self, text):
-        """Get response from Harry Potter AI with context from previous conversations"""
+        """Get response from Harry Potter AI (context disabled for speed)"""
         
         print("🧠 Harry is thinking...", end='', flush=True)
         
         try:
-            # Add context from previous conversations if enabled
-            if self.enable_context and self.context_manager:
-                context = self.context_manager.build_context_for_harry()
-                if context:
-                    # Prepend context to the user's question
-                    text_with_context = context + "\n\nCURRENT QUESTION: " + text
-                else:
-                    text_with_context = text
-            else:
-                text_with_context = text
-            
-            # Generate Harry's response
-            response, latency = self.harry.ask_harry(text_with_context)
+            # Context disabled for maximum speed - each response is standalone
+            response, latency = self.harry.ask_harry(text)
             print(f"\r✅ Response ready! ({latency}ms)     ")
             return response
             
@@ -894,10 +885,9 @@ class HarryVoiceAssistant:
                     # 6. Save conversation (audio + transcript + emotion)
                     conv_dir = self.save_conversation(audio, sample_rate, transcription, response, conversation_count, emotion_data)
                     
-                    # 7. Generate insights in background (if enabled)
+                    # 7. Generate insights in background (if enabled) - non-blocking, silent
                     if self.enable_insights and self.analyzer:
-                        print("🔍 Generating insights in background...")
-                        self.analyzer.analyze_conversation_async(conv_dir)
+                        self.analyzer.analyze_conversation_async(conv_dir)  # Runs silently in background
                     
                     # 8. Speak response (save to audio/ folder and conversation folder)
                     self.speak(response, conversation_count, conv_dir)
@@ -977,10 +967,9 @@ class HarryVoiceAssistant:
                     # Save conversation (audio + transcript + emotion)
                     conv_dir = self.save_conversation(audio, sample_rate, transcription, response, conversation_count, emotion_data)
                     
-                    # Generate insights in background (if enabled)
+                    # Generate insights in background (if enabled) - non-blocking, silent
                     if self.enable_insights and self.analyzer:
-                        print("🔍 Generating insights in background...")
-                        self.analyzer.analyze_conversation_async(conv_dir)
+                        self.analyzer.analyze_conversation_async(conv_dir)  # Runs silently in background
                     
                     print()
                     self.speak(response, conversation_count, conv_dir)

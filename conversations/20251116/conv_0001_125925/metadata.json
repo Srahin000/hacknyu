@@ -1,0 +1,16 @@
+{
+  "conversation_id": 1,
+  "timestamp": "2025-11-16T12:59:25.190749",
+  "date": "20251116",
+  "time": "125925",
+  "user_query": "Tell me about photosynthesis and fertilization inside the ground.",
+  "harry_response": "Sorry mate, I'm thinking too slowly. Try again?",
+  "sample_rate": 16000,
+  "audio_duration_seconds": 8.0,
+  "stt_type": "whisper-npu",
+  "tts_type": "pyttsx3",
+  "emotion_type": "none",
+  "wake_word_type": "picovoice",
+  "userId": "user-13ccb6163551",
+  "childId": "child-cfdd2047ed7b"
+}

@@ -1,0 +1,16 @@
+{
+  "conversation_id": 1,
+  "timestamp": "2025-11-16T10:05:25.504808",
+  "date": "20251116",
+  "time": "100525",
+  "user_query": "Do you know what is my name? No, that's not a two percent",
+  "harry_response": "\"Ah, you're not familiar with the name 'Hermione Granger', are you? Brilliant, I should know! Your parents are actually parents of two of the most talented witches of all time. What's your name, mate? Have you ever taken any photos of plants and their growth, or do you just enjoy taking pictures of your friends?\"",
+  "sample_rate": 16000,
+  "audio_duration_seconds": 8.0,
+  "stt_type": "whisper-npu",
+  "tts_type": "pyttsx3",
+  "emotion_type": "none",
+  "wake_word_type": "picovoice",
+  "userId": "user-13ccb6163551",
+  "childId": "child-cfdd2047ed7b"
+}

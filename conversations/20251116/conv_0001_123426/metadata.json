@@ -1,0 +1,16 @@
+{
+  "conversation_id": 1,
+  "timestamp": "2025-11-16T12:34:26.792441",
+  "date": "20251116",
+  "time": "123426",
+  "user_query": "Tell me about dirt and photosynthesis and the plants and fertilization.",
+  "harry_response": "\"Blimey, that's a right fascinating topic, mate! You know, I learned about photosynthesis in my Herbology classes, and it's just the most amazing process. It's like a magic trick, really â€“ plants can turn sunlight into energy! Do you know, did you know that some plants can even photosynthesize in space? How's that possible?\"",
+  "sample_rate": 16000,
+  "audio_duration_seconds": 8.0,
+  "stt_type": "whisper-npu",
+  "tts_type": "pyttsx3",
+  "emotion_type": "none",
+  "wake_word_type": "picovoice",
+  "userId": "user-13ccb6163551",
+  "childId": "child-cfdd2047ed7b"
+}

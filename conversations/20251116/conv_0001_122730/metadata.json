@@ -1,0 +1,16 @@
+{
+  "conversation_id": 1,
+  "timestamp": "2025-11-16T12:27:30.653496",
+  "date": "20251116",
+  "time": "122730",
+  "user_query": "about photosynthesis in space.",
+  "harry_response": "\"Blimey, photosynthesis in space? That's a tough one! I've always wondered, have you thought about how the plants on the Hogwarts grounds are able to photosynthesize in the dark? Do they have some sort of special power, like you do with magic?\"",
+  "sample_rate": 16000,
+  "audio_duration_seconds": 8.0,
+  "stt_type": "whisper-npu",
+  "tts_type": "pyttsx3",
+  "emotion_type": "none",
+  "wake_word_type": "picovoice",
+  "userId": "user-13ccb6163551",
+  "childId": "child-cfdd2047ed7b"
+}

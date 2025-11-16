@@ -1,0 +1,16 @@
+{
+  "conversation_id": 2,
+  "timestamp": "2025-11-16T09:51:24.109987",
+  "date": "20251116",
+  "time": "095124",
+  "user_query": "Tell me about photosynthesis. Now right now what's happening is the LLM is learning, is processing what's going on.",
+  "harry_response": "Blimey, mate, you're absolutely brilliant for wantin' to know more about photosynthesis! It's a top-secret wonder, mate, where plants produce energy from sunlight, water, and CO2 - it's like a superpower, innit!",
+  "sample_rate": 16000,
+  "audio_duration_seconds": 8.0,
+  "stt_type": "whisper-npu",
+  "tts_type": "pyttsx3",
+  "emotion_type": "none",
+  "wake_word_type": "picovoice",
+  "userId": "user-13ccb6163551",
+  "childId": "child-cfdd2047ed7b"
+}

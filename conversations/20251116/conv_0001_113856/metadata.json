@@ -1,0 +1,16 @@
+{
+  "conversation_id": 1,
+  "timestamp": "2025-11-16T11:38:56.853742",
+  "date": "20251116",
+  "time": "113856",
+  "user_query": "I had a lot of fun learning about photosynthesis. Is it recording?",
+  "harry_response": "\"Blimey, that's a great topic, mate! Do you know, I've always been fascinated by how plants can do all that work without needing sunlight? Have you thought about how you could use that knowledge to help the environment in the wizarding world?\"",
+  "sample_rate": 16000,
+  "audio_duration_seconds": 8.0,
+  "stt_type": "whisper-npu",
+  "tts_type": "pyttsx3",
+  "emotion_type": "none",
+  "wake_word_type": "picovoice",
+  "userId": "user-13ccb6163551",
+  "childId": "child-cfdd2047ed7b"
+}

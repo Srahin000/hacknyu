@@ -1,0 +1,16 @@
+{
+  "conversation_id": 2,
+  "timestamp": "2025-11-16T11:41:16.874783",
+  "date": "20251116",
+  "time": "114116",
+  "user_query": "like one of the top ones and then there's interaction where you can see like how many times they had with their most",
+  "harry_response": "Sorry mate, I'm thinking too slowly. Try again?",
+  "sample_rate": 16000,
+  "audio_duration_seconds": 8.0,
+  "stt_type": "whisper-npu",
+  "tts_type": "pyttsx3",
+  "emotion_type": "none",
+  "wake_word_type": "picovoice",
+  "userId": "user-13ccb6163551",
+  "childId": "child-cfdd2047ed7b"
+}

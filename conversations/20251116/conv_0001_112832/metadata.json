@@ -1,0 +1,16 @@
+{
+  "conversation_id": 1,
+  "timestamp": "2025-11-16T11:28:32.984209",
+  "date": "20251116",
+  "time": "112832",
+  "user_query": "about photosynthesis and basketball.",
+  "harry_response": "\"Blimey, mate, you're really into plants, huh? How's your understanding of photosynthesis? Do you know that plants make their own food using sunlight, just like how I make my own magic?\"",
+  "sample_rate": 16000,
+  "audio_duration_seconds": 8.0,
+  "stt_type": "whisper-npu",
+  "tts_type": "pyttsx3",
+  "emotion_type": "none",
+  "wake_word_type": "picovoice",
+  "userId": "user-13ccb6163551",
+  "childId": "child-cfdd2047ed7b"
+}

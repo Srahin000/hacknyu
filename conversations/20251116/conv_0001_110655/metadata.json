@@ -1,0 +1,16 @@
+{
+  "conversation_id": 1,
+  "timestamp": "2025-11-16T11:06:55.983773",
+  "date": "20251116",
+  "time": "110655",
+  "user_query": "Tell me about photosynthesis.",
+  "harry_response": "\"Blimey, photosynthesis is like a super cool magic trick, mate! It's how plants turn sunlight into energy, kind of like how magic wands work, but instead of waving a wand, they just sort of... snap! So, what made you interested in learning about photosynthesis, eh? Have you ever seen a plant that just sort of... just grow?\"",
+  "sample_rate": 16000,
+  "audio_duration_seconds": 8.0,
+  "stt_type": "whisper-npu",
+  "tts_type": "pyttsx3",
+  "emotion_type": "none",
+  "wake_word_type": "picovoice",
+  "userId": "user-13ccb6163551",
+  "childId": "child-cfdd2047ed7b"
+}

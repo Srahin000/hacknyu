@@ -1,0 +1,16 @@
+{
+  "conversation_id": 1,
+  "timestamp": "2025-11-16T10:26:13.634021",
+  "date": "20251116",
+  "time": "102613",
+  "user_query": "The table numbers have been sent out of this form. The higher numbers are",
+  "harry_response": "\"Whoa, what's going on? What's that all about, mate? Are you saying the students are getting their table numbers? Can I see the actual numbers, please?\"",
+  "sample_rate": 16000,
+  "audio_duration_seconds": 8.0,
+  "stt_type": "whisper-npu",
+  "tts_type": "pyttsx3",
+  "emotion_type": "none",
+  "wake_word_type": "keyboard",
+  "userId": "user-13ccb6163551",
+  "childId": "child-cfdd2047ed7b"
+}

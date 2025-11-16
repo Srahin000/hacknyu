@@ -1,0 +1,16 @@
+{
+  "conversation_id": 1,
+  "timestamp": "2025-11-16T10:19:35.767437",
+  "date": "20251116",
+  "time": "101935",
+  "user_query": "Tell me about photosynthesis and how plants get through.",
+  "harry_response": "\"Blimey, photosynthesis is a right clever bit of magic, isn't it? Plants use chlorophyll to turn light energy from the sun into a type of energy that they can use for food. It's like a special power, innit?\"",
+  "sample_rate": 16000,
+  "audio_duration_seconds": 8.0,
+  "stt_type": "whisper-npu",
+  "tts_type": "pyttsx3",
+  "emotion_type": "none",
+  "wake_word_type": "picovoice",
+  "userId": "user-13ccb6163551",
+  "childId": "child-cfdd2047ed7b"
+}
