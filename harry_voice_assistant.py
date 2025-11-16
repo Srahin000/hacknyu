@@ -53,7 +53,10 @@ class HarryVoiceAssistant:
         self.stt_ready = False
         self.llm_ready = False
         self.tts_ready = False
+        self.emotion_ready = False
+        self.stt_type = None  # Will be set in _init_stt
         self.tts_type = None  # Will be set in _init_tts
+        self.emotion_type = None  # Will be set in _init_emotion
         self.cpu_mode = cpu_mode
         
         # Storage setup
@@ -77,10 +80,11 @@ class HarryVoiceAssistant:
         self._init_stt()
         self._init_llm()
         self._init_tts()
+        self._init_emotion()
         
-        # Check if ready
+        # Check if ready (emotion is optional)
         if not all([self.wake_word_ready, self.stt_ready, self.llm_ready, self.tts_ready]):
-            print("\n❌ Not all components ready!")
+            print("\n❌ Not all critical components ready!")
             sys.exit(1)
         
         print("\n" + "="*70)
@@ -247,9 +251,26 @@ class HarryVoiceAssistant:
         except Exception as e:
             print(f"  ❌ LLM error: {e}")
     
+    def _init_emotion(self):
+        """Initialize Emotion Detection (NPU or skip)"""
+        print("😊 [4/5] Initializing Emotion Detection...")
+        
+        try:
+            from emotion_npu import EmotionNPU
+            self.emotion_detector = EmotionNPU()
+            self.emotion_type = self.emotion_detector.inference_type
+            self.emotion_ready = True
+            print(f"  ✅ Emotion detection ready ({self.emotion_type})")
+        except Exception as e:
+            print(f"  ⚠️  Emotion detection not available: {e}")
+            print("     Continuing without emotion detection...")
+            self.emotion_detector = None
+            self.emotion_type = "none"
+            self.emotion_ready = False
+    
     def _init_tts(self):
         """Initialize Text-to-Speech using XTTS v2 with pyttsx3 fallback"""
-        print("🔊 [4/4] Initializing Text-to-Speech...")
+        print("🔊 [5/5] Initializing Text-to-Speech...")
         
         # Try XTTS v2 first
         try:
@@ -373,22 +394,14 @@ class HarryVoiceAssistant:
         
         return audio.flatten(), sample_rate
     
-    def save_conversation(self, audio, sample_rate, transcription, harry_response, conversation_id):
-        """Save audio file and transcript - saved in BOTH organized folders AND single audio folder"""
+    def save_conversation(self, audio, sample_rate, transcription, harry_response, conversation_id, emotion_data=None):
+        """Save audio file and transcript to organized conversation folder ONLY"""
         
         # Create timestamp for this conversation
         timestamp = datetime.now()
         date_str = timestamp.strftime("%Y%m%d")
         time_str = timestamp.strftime("%H%M%S")
         
-        # Filename for this conversation
-        audio_filename = f"user_{date_str}_{time_str}_conv{conversation_id:04d}.wav"
-        
-        # ===== SAVE TO SINGLE AUDIO FOLDER (all files together) =====
-        audio_path_single = self.audio_dir / audio_filename
-        sf.write(str(audio_path_single), audio, sample_rate)
-        
-        # ===== SAVE TO ORGANIZED CONVERSATION FOLDER =====
         # Create date directory
         date_dir = self.storage_dir / date_str
         date_dir.mkdir(exist_ok=True)
@@ -397,30 +410,37 @@ class HarryVoiceAssistant:
         conv_dir = date_dir / f"conv_{conversation_id:04d}_{time_str}"
         conv_dir.mkdir(exist_ok=True)
         
-        # Save user audio in conversation folder
+        # Save user audio in conversation folder (NOT in audio/ folder - that's for TTS only)
         audio_path_organized = conv_dir / "user_audio.wav"
         sf.write(str(audio_path_organized), audio, sample_rate)
         
-        # Save transcript in both places
-        transcript_content = (
-            f"Conversation #{conversation_id}\n"
-            f"Timestamp: {timestamp.strftime('%Y-%m-%d %H:%M:%S')}\n"
-            f"{'=' * 70}\n\n"
-            f"USER:\n{transcription}\n\n"
-            f"HARRY:\n{harry_response}\n"
-        )
+        # Build transcript content with emotion if available
+        transcript_parts = [
+            f"Conversation #{conversation_id}",
+            f"Timestamp: {timestamp.strftime('%Y-%m-%d %H:%M:%S')}",
+            f"{'=' * 70}",
+            ""
+        ]
         
-        # Transcript in single audio folder
-        transcript_path_single = self.audio_dir / f"user_{date_str}_{time_str}_conv{conversation_id:04d}.txt"
-        with open(transcript_path_single, 'w', encoding='utf-8') as f:
-            f.write(transcript_content)
+        if emotion_data and emotion_data[0]:
+            emotion, confidence, _, _ = emotion_data
+            transcript_parts.append(f"EMOTION: {emotion.upper()} ({confidence*100:.0f}% confidence)")
+            transcript_parts.append("")
         
-        # Transcript in organized folder
+        transcript_parts.extend([
+            f"USER:\n{transcription}",
+            "",
+            f"HARRY:\n{harry_response}"
+        ])
+        
+        transcript_content = "\n".join(transcript_parts)
+        
+        # Save transcript in conversation folder
         transcript_path_organized = conv_dir / "transcript.txt"
         with open(transcript_path_organized, 'w', encoding='utf-8') as f:
             f.write(transcript_content)
         
-        # Save metadata JSON in organized folder
+        # Build metadata JSON
         metadata = {
             "conversation_id": conversation_id,
             "timestamp": timestamp.isoformat(),
@@ -428,20 +448,45 @@ class HarryVoiceAssistant:
             "time": time_str,
             "user_query": transcription,
             "harry_response": harry_response,
-            "user_audio_file": audio_filename,
             "sample_rate": sample_rate,
             "audio_duration_seconds": len(audio) / sample_rate,
             "stt_type": self.stt_type,
             "tts_type": self.tts_type,
+            "emotion_type": self.emotion_type,
             "wake_word_type": self.wake_word_type
         }
         
+        # Add emotion data if available
+        if emotion_data and emotion_data[0]:
+            emotion, confidence, latency, all_scores = emotion_data
+            metadata["emotion"] = {
+                "detected": emotion,
+                "confidence": confidence,
+                "latency_ms": latency,
+                "all_scores": all_scores
+            }
+        
+        # Save metadata JSON in organized folder
         metadata_path = conv_dir / "metadata.json"
         with open(metadata_path, 'w', encoding='utf-8') as f:
             json.dump(metadata, f, indent=2, ensure_ascii=False)
         
-        print(f"💾 User audio saved: audio/{audio_filename} + {conv_dir.name}/")
-        return audio_path_single, conv_dir
+        print(f"💾 Conversation saved: {conv_dir.name}/")
+        return conv_dir
+    
+    def detect_emotion(self, audio, sample_rate):
+        """Detect emotion from audio"""
+        
+        if not self.emotion_ready or self.emotion_detector is None:
+            return None, 0.0, 0, {}
+        
+        try:
+            emotion, confidence, latency, all_scores = self.emotion_detector.detect_emotion(audio, sample_rate)
+            print(f"😊 Emotion detected: {emotion.upper()} ({confidence*100:.0f}% confidence, {latency}ms on {self.emotion_type})")
+            return emotion, confidence, latency, all_scores
+        except Exception as e:
+            print(f"⚠️  Emotion detection failed: {e}")
+            return None, 0.0, 0, {}
     
     def transcribe_audio(self, audio, sample_rate):
         """Transcribe audio to text using Whisper (NPU or CPU)"""
@@ -480,7 +525,7 @@ class HarryVoiceAssistant:
             return None
     
     def speak(self, text, conversation_id=None, conv_dir=None):
-        """Speak text using TTS and save in BOTH single audio folder AND organized folder"""
+        """Speak text using TTS and save to audio/ folder (TTS only) + conversation folder"""
         
         print(f"🔊 Harry speaks: \"{text}\"")
         
@@ -490,22 +535,22 @@ class HarryVoiceAssistant:
                 import sounddevice as sd
                 import soundfile as sf
                 
-                # Generate filename with timestamp
+                # Generate filename with timestamp for audio/ folder
                 timestamp = datetime.now()
                 date_str = timestamp.strftime('%Y%m%d')
                 time_str = timestamp.strftime('%H%M%S')
-                filename = f"harry_{date_str}_{time_str}"
+                filename = f"harry_tts_{date_str}_{time_str}"
                 if conversation_id:
                     filename += f"_conv{conversation_id:04d}"
                 filename += ".wav"
                 
-                # ===== SAVE TO SINGLE AUDIO FOLDER =====
-                audio_path_single = self.audio_dir / filename
+                # ===== SAVE TO AUDIO FOLDER (TTS responses only) =====
+                audio_path_tts = self.audio_dir / filename
                 
                 # Generate speech with Harry Potter voice parameters
                 self.tts_engine.tts_to_file(
                     text=text,
-                    file_path=str(audio_path_single),
+                    file_path=str(audio_path_tts),
                     language="en",
                     speaker=self.tts_speaker,  # "male-en-2"
                     emotion=self.tts_emotion,  # "happy"
@@ -513,30 +558,30 @@ class HarryVoiceAssistant:
                     pitch=self.tts_pitch       # 1.20 (kid-like pitch)
                 )
                 
-                # Save transcript in single audio folder
-                transcript_path_single = audio_path_single.with_suffix('.txt')
-                with open(transcript_path_single, 'w', encoding='utf-8') as f:
+                # Save text transcript in audio folder
+                transcript_path_tts = audio_path_tts.with_suffix('.txt')
+                with open(transcript_path_tts, 'w', encoding='utf-8') as f:
                     f.write(text)
                 
-                # ===== SAVE TO ORGANIZED CONVERSATION FOLDER (if provided) =====
+                # ===== ALSO SAVE TO CONVERSATION FOLDER (if provided) =====
                 if conv_dir:
-                    audio_path_organized = conv_dir / "harry_audio.wav"
+                    audio_path_conv = conv_dir / "harry_audio.wav"
                     # Copy the audio file
                     import shutil
-                    shutil.copy2(str(audio_path_single), str(audio_path_organized))
+                    shutil.copy2(str(audio_path_tts), str(audio_path_conv))
                     
-                    # Save transcript in organized folder
-                    transcript_path_organized = conv_dir / "harry_response.txt"
-                    with open(transcript_path_organized, 'w', encoding='utf-8') as f:
+                    # Save text in conversation folder
+                    transcript_path_conv = conv_dir / "harry_response.txt"
+                    with open(transcript_path_conv, 'w', encoding='utf-8') as f:
                         f.write(text)
                 
                 # Play the audio
-                audio_data, sample_rate = sf.read(str(audio_path_single))
+                audio_data, sample_rate = sf.read(str(audio_path_tts))
                 sd.play(audio_data, sample_rate)
                 sd.wait()  # Wait until playback is finished
                 
-                print(f"💾 Harry audio saved: audio/{filename}" + (f" + {conv_dir.name}/" if conv_dir else ""))
-                return audio_path_single
+                print(f"💾 TTS audio saved: audio/{filename}" + (f" + {conv_dir.name}/" if conv_dir else ""))
+                return audio_path_tts
                 
             elif self.tts_type == "pyttsx3":
                 # pyttsx3 fallback (no file saving for pyttsx3)
@@ -594,7 +639,10 @@ class HarryVoiceAssistant:
                     # 2. Record audio
                     audio, sample_rate = self.record_audio(duration=8)
                     
-                    # 3. Transcribe
+                    # 3. Detect emotion (if available)
+                    emotion_data = self.detect_emotion(audio, sample_rate)
+                    
+                    # 4. Transcribe
                     transcription = self.transcribe_audio(audio, sample_rate)
                     
                     if not transcription or len(transcription.strip()) < 3:
@@ -606,7 +654,7 @@ class HarryVoiceAssistant:
                     print(f"\n💬 You said: \"{transcription}\"")
                     print()
                     
-                    # 4. Get LLM response
+                    # 5. Get LLM response
                     response = self.get_harry_response(transcription)
                     
                     if not response:
@@ -615,10 +663,10 @@ class HarryVoiceAssistant:
                     
                     print()
                     
-                    # 5. Save conversation (audio + transcript)
-                    _, conv_dir = self.save_conversation(audio, sample_rate, transcription, response, conversation_count)
+                    # 6. Save conversation (audio + transcript + emotion)
+                    conv_dir = self.save_conversation(audio, sample_rate, transcription, response, conversation_count, emotion_data)
                     
-                    # 6. Speak response (save to both audio/ and organized folder)
+                    # 7. Speak response (save to audio/ folder and conversation folder)
                     self.speak(response, conversation_count, conv_dir)
                     
                     print()
@@ -663,6 +711,9 @@ class HarryVoiceAssistant:
                 # Record
                 audio, sample_rate = self.record_audio(duration=6)
                 
+                # Detect emotion (if available)
+                emotion_data = self.detect_emotion(audio, sample_rate)
+                
                 # Transcribe
                 transcription = self.transcribe_audio(audio, sample_rate)
                 
@@ -676,8 +727,8 @@ class HarryVoiceAssistant:
                 response = self.get_harry_response(transcription)
                 
                 if response:
-                    # Save conversation (audio + transcript)
-                    _, conv_dir = self.save_conversation(audio, sample_rate, transcription, response, conversation_count)
+                    # Save conversation (audio + transcript + emotion)
+                    conv_dir = self.save_conversation(audio, sample_rate, transcription, response, conversation_count, emotion_data)
                     
                     print()
                     self.speak(response, conversation_count, conv_dir)

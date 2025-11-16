@@ -36,7 +36,7 @@ class HarryPotterNPU:
             )
             
             if result.returncode != 0:
-                return f"Error: {result.stderr}", int((time.time() - start) * 1000))
+                return f"Error: {result.stderr}", int((time.time() - start) * 1000)
             
             output = result.stdout
             if "[BEGIN]:" in output:
