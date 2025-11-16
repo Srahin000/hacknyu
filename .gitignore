@@ -54,6 +54,15 @@ Thumbs.db
 *.pb
 *.tflite
 *.h5
+*.bin
+*.gguf
+
+# Ignore entire models directory (large model files)
+models/
+!models/.gitkeep
+
+# Genie bundle (large NPU runtime files)
+genie_bundle/
 
 # Keep structure but ignore large files
 !deployed_models/.gitkeep
