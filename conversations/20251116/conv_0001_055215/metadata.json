@@ -1,0 +1,28 @@
+{
+  "conversation_id": 1,
+  "timestamp": "2025-11-16T05:52:15.098939",
+  "date": "20251116",
+  "time": "055215",
+  "user_query": "I need help. Can you help me? Can you also teach me your favorite spell? Thank you.",
+  "harry_response": "I'm happy to help, mate! I've got some brilliant ones up my sleeve, but I'm all ears. What's got you feeling stuck, then? What's on your mind?",
+  "sample_rate": 16000,
+  "audio_duration_seconds": 8.0,
+  "stt_type": "whisper-npu",
+  "tts_type": "pyttsx3",
+  "emotion_type": "npu",
+  "wake_word_type": "picovoice",
+  "emotion": {
+    "detected": "neutral",
+    "confidence": 0.5,
+    "latency_ms": 295,
+    "all_scores": {
+      "angry": 0.1420108824968338,
+      "disgust": 0.15693767368793488,
+      "fear": 0.15056665241718292,
+      "happy": 0.12558066844940186,
+      "neutral": 0.13656297326087952,
+      "sad": 0.15108217298984528,
+      "surprise": 0.13725903630256653
+    }
+  }
+}

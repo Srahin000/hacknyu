@@ -99,11 +99,14 @@ class HarryVoiceAssistant:
                 print(f"⚠️  Insight generation disabled: {e}")
                 self.enable_insights = False
         
-        # TTS parameters for Harry Potter voice
-        self.tts_speaker = "male-en-2"
-        self.tts_emotion = "happy"
-        self.tts_speed = 1.12  # youthful pacing
-        self.tts_pitch = 1.20  # kid-like pitch
+        # TTS parameters for Harry Potter cloned voice
+        self.voice_sample_path = Path("sound_sample/harry_sample.wav")
+        if not self.voice_sample_path.exists():
+            print(f"⚠️  Voice sample not found: {self.voice_sample_path}")
+            print("   Voice cloning will not work without the sample file!")
+        
+        # Note: XTTS v2 voice cloning uses the sample directly
+        # Speed/pitch/emotion control is limited in cloning mode
         
         # Initialize components
         self._init_wake_word()
@@ -241,45 +244,14 @@ class HarryVoiceAssistant:
             self.emotion_ready = False
     
     def _init_tts(self):
-        """Initialize Text-to-Speech using XTTS v2 with pyttsx3 fallback"""
+        """Initialize Text-to-Speech (pyttsx3 for now)"""
         print("🔊 [5/5] Initializing Text-to-Speech...")
         
-        # Try XTTS v2 first
-        try:
-            import torch
-            from TTS.api import TTS
-            
-            # Fix for PyTorch 2.6+ weights_only=True default
-            # TTS models need to load custom classes, so we temporarily allow unsafe loading
-            original_load = torch.load
-            def patched_load(*args, **kwargs):
-                if 'weights_only' not in kwargs:
-                    kwargs['weights_only'] = False
-                return original_load(*args, **kwargs)
-            torch.load = patched_load
-            
-            # Use XTTS v2 for high-quality multilingual TTS
-            print("  Loading XTTS v2 model...")
-            self.tts_engine = TTS("tts_models/multilingual/multi-dataset/xtts_v2", gpu=False)
-            
-            # Restore original torch.load after TTS loads
-            torch.load = original_load
-            
-            self.tts_type = "xtts_v2"
-            self.tts_ready = True
-            print("  ✅ Text-to-Speech ready (XTTS v2)")
-            return
-            
-        except Exception as e:
-            print(f"  ⚠️  XTTS v2 failed: {e}")
-            print("     Trying pyttsx3 fallback...")
-        
-        # Fallback to pyttsx3
         try:
             import pyttsx3
             
             self.tts_engine = pyttsx3.init()
-            self.tts_engine.setProperty('rate', 160)  # Slightly faster
+            self.tts_engine.setProperty('rate', 160)
             self.tts_engine.setProperty('volume', 0.9)
             
             # Try to find a good voice
@@ -291,13 +263,13 @@ class HarryVoiceAssistant:
             
             self.tts_type = "pyttsx3"
             self.tts_ready = True
-            print("  ✅ Text-to-Speech ready (pyttsx3 fallback)")
+            print(f"  ✅ Text-to-Speech ready (pyttsx3)")
             
         except Exception as e:
             print(f"  ❌ TTS error: {e}")
-            print("     Install with: pip install TTS (for XTTS) or pip install pyttsx3 (for fallback)")
-            import traceback
-            traceback.print_exc()
+            print(f"     Install with: pip install pyttsx3")
+            self.tts_type = "none"
+            self.tts_ready = False
     
     def listen_for_wake_word(self):
         """Listen for 'Harry Potter' wake word or keyboard input"""
@@ -533,74 +505,22 @@ class HarryVoiceAssistant:
             return None
     
     def speak(self, text, conversation_id=None, conv_dir=None):
-        """Speak text using TTS and save to audio/ folder (TTS only) + conversation folder"""
+        """Speak text using pyttsx3"""
         
         print(f"🔊 Harry speaks: \"{text}\"")
         
+        if not self.tts_ready:
+            return None
+        
         try:
-            if self.tts_type == "xtts_v2":
-                # XTTS v2: generate audio and play it
-                import sounddevice as sd
-                import soundfile as sf
-                
-                # Generate filename with timestamp for audio/ folder
-                timestamp = datetime.now()
-                date_str = timestamp.strftime('%Y%m%d')
-                time_str = timestamp.strftime('%H%M%S')
-                filename = f"harry_tts_{date_str}_{time_str}"
-                if conversation_id:
-                    filename += f"_conv{conversation_id:04d}"
-                filename += ".wav"
-                
-                # ===== SAVE TO AUDIO FOLDER (TTS responses only) =====
-                audio_path_tts = self.audio_dir / filename
-                
-                # Generate speech with Harry Potter voice parameters
-                self.tts_engine.tts_to_file(
-                    text=text,
-                    file_path=str(audio_path_tts),
-                    language="en",
-                    speaker=self.tts_speaker,  # "male-en-2"
-                    emotion=self.tts_emotion,  # "happy"
-                    speed=self.tts_speed,      # 1.12 (youthful pacing)
-                    pitch=self.tts_pitch       # 1.20 (kid-like pitch)
-                )
-                
-                # Save text transcript in audio folder
-                transcript_path_tts = audio_path_tts.with_suffix('.txt')
-                with open(transcript_path_tts, 'w', encoding='utf-8') as f:
-                    f.write(text)
-                
-                # ===== ALSO SAVE TO CONVERSATION FOLDER (if provided) =====
-                if conv_dir:
-                    audio_path_conv = conv_dir / "harry_audio.wav"
-                    # Copy the audio file
-                    import shutil
-                    shutil.copy2(str(audio_path_tts), str(audio_path_conv))
-                    
-                    # Save text in conversation folder
-                    transcript_path_conv = conv_dir / "harry_response.txt"
-                    with open(transcript_path_conv, 'w', encoding='utf-8') as f:
-                        f.write(text)
-                
-                # Play the audio
-                audio_data, sample_rate = sf.read(str(audio_path_tts))
-                sd.play(audio_data, sample_rate)
-                sd.wait()  # Wait until playback is finished
-                
-                print(f"💾 TTS audio saved: audio/{filename}" + (f" + {conv_dir.name}/" if conv_dir else ""))
-                return audio_path_tts
-                
-            elif self.tts_type == "pyttsx3":
-                # pyttsx3 fallback (no file saving for pyttsx3)
+            if self.tts_type == "pyttsx3":
                 self.tts_engine.say(text)
                 self.tts_engine.runAndWait()
                 return None
             
         except Exception as e:
             print(f"❌ TTS error: {e}")
-            import traceback
-            traceback.print_exc()
+            return None
     
     def run(self):
         """Run the voice assistant loop"""
