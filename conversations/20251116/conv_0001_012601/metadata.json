@@ -1,0 +1,28 @@
+{
+  "conversation_id": 1,
+  "timestamp": "2025-11-16T01:26:01.546546",
+  "date": "20251116",
+  "time": "012601",
+  "user_query": "I'm a bit scared. I need to figure out how to make this run and it's not running.",
+  "harry_response": "Error: ",
+  "sample_rate": 16000,
+  "audio_duration_seconds": 8.0,
+  "stt_type": "whisper-npu",
+  "tts_type": "pyttsx3",
+  "emotion_type": "npu",
+  "wake_word_type": "picovoice",
+  "emotion": {
+    "detected": "disgust",
+    "confidence": 0.15761174261569977,
+    "latency_ms": 622,
+    "all_scores": {
+      "angry": 0.13921713829040527,
+      "disgust": 0.15761174261569977,
+      "fear": 0.15531979501247406,
+      "happy": 0.12942254543304443,
+      "neutral": 0.14028549194335938,
+      "sad": 0.14338892698287964,
+      "surprise": 0.13475435972213745
+    }
+  }
+}

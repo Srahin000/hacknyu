@@ -27,13 +27,13 @@ class WhisperCPU:
             import whisper
             self.model = whisper.load_model(model_size)
             self.inference_type = f"CPU (whisper-{model_size})"
-            print(f"  ✅ Whisper CPU ready ({model_size})")
+            print(f"  [OK] Whisper CPU ready ({model_size})")
         except ImportError:
-            print("  ❌ OpenAI whisper not installed!")
+            print("  [ERROR] OpenAI whisper not installed!")
             print("     Install with: pip install openai-whisper")
             raise
         except Exception as e:
-            print(f"  ❌ Failed to load Whisper: {e}")
+            print(f"  [ERROR] Failed to load Whisper: {e}")
             raise
     
     def transcribe(self, audio, sample_rate):
@@ -69,7 +69,7 @@ class WhisperCPU:
             return transcription, latency_ms
             
         except Exception as e:
-            print(f"  ❌ Transcription error: {e}")
+            print(f"  [ERROR] Transcription error: {e}")
             import traceback
             traceback.print_exc()
             return None, 0

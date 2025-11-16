@@ -154,6 +154,11 @@ class EmotionNPU:
             
             latency_ms = int((time.time() - start_time) * 1000)
             
+            # TEMPORARY FIX: If confidence is too low (model not optimized), return neutral
+            if confidence < 0.30:  # Less than 30% confidence = random guessing
+                emotion = "neutral"
+                confidence = 0.50  # Mark as "uncertain"
+            
             return emotion, confidence, latency_ms, all_scores
             
         except Exception as e:

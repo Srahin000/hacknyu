@@ -1,0 +1,28 @@
+{
+  "conversation_id": 1,
+  "timestamp": "2025-11-16T02:03:29.293054",
+  "date": "20251116",
+  "time": "020329",
+  "user_query": "Hello my name is Abadraken, I don't know what to talk about.",
+  "harry_response": "You're not from around here, are you? What brings you to Hogwarts?",
+  "sample_rate": 16000,
+  "audio_duration_seconds": 6.0,
+  "stt_type": "whisper-cpu",
+  "tts_type": "pyttsx3",
+  "emotion_type": "npu",
+  "wake_word_type": "picovoice",
+  "emotion": {
+    "detected": "disgust",
+    "confidence": 0.15796002745628357,
+    "latency_ms": 676,
+    "all_scores": {
+      "angry": 0.14046254754066467,
+      "disgust": 0.15796002745628357,
+      "fear": 0.15013886988162994,
+      "happy": 0.12619061768054962,
+      "neutral": 0.1406426876783371,
+      "sad": 0.1456795483827591,
+      "surprise": 0.138925701379776
+    }
+  }
+}

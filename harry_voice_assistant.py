@@ -25,25 +25,32 @@ from pathlib import Path
 # Fix Windows console encoding
 if sys.platform == 'win32':
     import io
-    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
-    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
+    try:
+        # Only wrap if not already wrapped and buffer exists
+        if hasattr(sys.stdout, 'buffer') and not isinstance(sys.stdout, io.TextIOWrapper):
+            sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace', line_buffering=True)
+        if hasattr(sys.stderr, 'buffer') and not isinstance(sys.stderr, io.TextIOWrapper):
+            sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace', line_buffering=True)
+    except (AttributeError, ValueError):
+        # If wrapping fails, just continue with the default stdout/stderr
+        pass
 
 
 class HarryVoiceAssistant:
     """Complete voice assistant for Harry Potter"""
     
-    def __init__(self, cpu_mode=False):
+    def __init__(self, enable_context=True, enable_insights=True):
         """
         Initialize all components
         
         Args:
-            cpu_mode: If True, use CPU for Whisper and LLM (skip NPU)
+            enable_context: Enable conversation context (loads insights from previous conversations)
+            enable_insights: Enable automatic insight generation after each conversation
         """
         
         print("\n" + "="*70)
         print(" ⚡ HARRY POTTER VOICE ASSISTANT ⚡".center(70))
-        if cpu_mode:
-            print(" 🖥️  CPU MODE (Testing while NPU downloads) ".center(70))
+        print(" 🚀 NPU-Powered with Qualcomm Genie ".center(70))
         print("="*70)
         print()
         
@@ -57,7 +64,8 @@ class HarryVoiceAssistant:
         self.stt_type = None  # Will be set in _init_stt
         self.tts_type = None  # Will be set in _init_tts
         self.emotion_type = None  # Will be set in _init_emotion
-        self.cpu_mode = cpu_mode
+        self.enable_context = enable_context
+        self.enable_insights = enable_insights
         
         # Storage setup
         self.storage_dir = Path("conversations")
@@ -68,6 +76,28 @@ class HarryVoiceAssistant:
         self.audio_dir.mkdir(exist_ok=True)
         
         self.conversation_count = 0
+        
+        # Context manager (reads insights)
+        self.context_manager = None
+        if self.enable_context:
+            try:
+                from context_manager import ContextManager
+                self.context_manager = ContextManager()
+                print("🧠 Context enabled (loads previous conversation insights)")
+            except Exception as e:
+                print(f"⚠️  Context system disabled: {e}")
+                self.enable_context = False
+        
+        # Conversation analyzer (generates insights in background)
+        self.analyzer = None
+        if self.enable_insights:
+            try:
+                from conversation_analyzer import ConversationAnalyzer
+                self.analyzer = ConversationAnalyzer(cpu_mode=False)  # Use NPU for analysis
+                print("🔍 Insight generation enabled (analyzes conversations in background)")
+            except Exception as e:
+                print(f"⚠️  Insight generation disabled: {e}")
+                self.enable_insights = False
         
         # TTS parameters for Harry Potter voice
         self.tts_speaker = "male-en-2"
@@ -156,27 +186,9 @@ class HarryVoiceAssistant:
             self.wake_word_ready = True
     
     def _init_stt(self):
-        """Initialize Speech-to-Text (Whisper NPU or CPU)"""
+        """Initialize Speech-to-Text (Whisper NPU only)"""
         print("🎤 [2/4] Initializing Speech-to-Text...")
         
-        # CPU mode: use CPU Whisper (OpenAI Whisper library)
-        if self.cpu_mode:
-            try:
-                from whisper_cpu import WhisperCPU
-                print("  Loading Whisper on CPU (OpenAI Whisper library)...")
-                self.stt_model = WhisperCPU(model_size="base")
-                self.stt_type = "whisper-cpu"
-                print(f"  ✅ Using CPU Whisper ({self.stt_model.inference_type})")
-                self.stt_ready = True
-                return
-            except Exception as e:
-                print(f"  ❌ CPU Whisper failed: {e}")
-                print(f"     Install with: pip install openai-whisper")
-                import traceback
-                traceback.print_exc()
-                return
-        
-        # Normal mode: try NPU first, fallback to CPU
         try:
             # Use NPU Whisper (encoder + decoder on Snapdragon X Elite)
             from whisper_npu_full import WhisperNPU
@@ -187,69 +199,29 @@ class HarryVoiceAssistant:
             self.stt_ready = True
             
         except Exception as e:
-            print(f"  ⚠️  NPU Whisper failed, trying CPU fallback...")
-            print(f"     Error: {e}")
-            try:
-                from whisper_cpu import WhisperCPU
-                print("  Loading Whisper on CPU (fallback, OpenAI Whisper library)...")
-                self.stt_model = WhisperCPU(model_size="base")
-                self.stt_type = "whisper-cpu"
-                print(f"  ✅ Using CPU Whisper ({self.stt_model.inference_type})")
-                self.stt_ready = True
-            except Exception as e2:
-                print(f"  ❌ CPU Whisper also failed: {e2}")
-                print(f"     Install with: pip install openai-whisper")
+            print(f"  ❌ NPU Whisper failed: {e}")
+            print(f"     Make sure Whisper models are deployed to NPU")
+            print(f"     See: WHISPER_NPU_FIX.md")
             import traceback
             traceback.print_exc()
+            sys.exit(1)
     
     def _init_llm(self):
-        """Initialize LLM (NPU Genie or CPU fallback)"""
+        """Initialize LLM (NPU Genie only)"""
         print("🧠 [3/4] Initializing Harry Potter AI...")
         
-        # CPU mode: skip NPU, use CPU only
-        if self.cpu_mode:
-            try:
-                from harry_llama_cpp import HarryPotterLlamaCpp
-                import sys
-                old_stdout = sys.stdout
-                sys.stdout = open(os.devnull, 'w')
-                try:
-                    self.harry = HarryPotterLlamaCpp()
-                    self.llm_ready = True
-                finally:
-                    sys.stdout.close()
-                    sys.stdout = old_stdout
-                print("  ✅ Harry Potter AI loaded (CPU mode)")
-                return
-            except Exception as e:
-                print(f"  ❌ CPU LLM error: {e}")
-                return
-        
-        # Normal mode: try NPU first, fallback to CPU
         try:
             from harry_llm_npu import HarryPotterNPU
             self.harry = HarryPotterNPU()
             self.llm_ready = True
-            print("  ✅ Harry Potter AI loaded (NPU Genie)")
-            return
+            print("  ✅ Harry Potter AI loaded (Qualcomm Genie on NPU)")
         except Exception as e:
-            pass
-        
-        # Fallback to CPU
-        try:
-            from harry_llama_cpp import HarryPotterLlamaCpp
-            import sys
-            old_stdout = sys.stdout
-            sys.stdout = open(os.devnull, 'w')
-            try:
-                self.harry = HarryPotterLlamaCpp()
-                self.llm_ready = True
-            finally:
-                sys.stdout.close()
-                sys.stdout = old_stdout
-            print("  ✅ Harry Potter AI loaded (CPU fallback)")
-        except Exception as e:
-            print(f"  ❌ LLM error: {e}")
+            print(f"  ❌ Genie LLM failed: {e}")
+            print(f"     Make sure Genie bundle is properly configured")
+            print(f"     Test with: python run_genie_safe.py \"Hello\"")
+            import traceback
+            traceback.print_exc()
+            sys.exit(1)
     
     def _init_emotion(self):
         """Initialize Emotion Detection (NPU or skip)"""
@@ -392,7 +364,30 @@ class HarryVoiceAssistant:
         sd.wait()
         print("\r✅ Recording complete!                    ")
         
-        return audio.flatten(), sample_rate
+        audio = audio.flatten()
+        
+        # AUTO-GAIN BOOST: Fix quiet microphones
+        max_amplitude = np.abs(audio).max()
+        if max_amplitude > 0:
+            # Target amplitude is 0.5 (leaves headroom for peaks)
+            target_amplitude = 0.5
+            gain = target_amplitude / max_amplitude
+            
+            # Limit gain to prevent noise amplification
+            # If original is super quiet (<0.01), something is wrong, cap the gain
+            if max_amplitude < 0.01:
+                gain = min(gain, 20.0)  # Max 20x boost for very quiet audio
+            elif max_amplitude < 0.1:
+                gain = min(gain, 10.0)  # Max 10x boost for quiet audio
+            else:
+                gain = min(gain, 5.0)   # Max 5x boost for normal-ish audio
+            
+            audio = audio * gain
+            
+            # Clip to prevent distortion
+            audio = np.clip(audio, -1.0, 1.0)
+        
+        return audio, sample_rate
     
     def save_conversation(self, audio, sample_rate, transcription, harry_response, conversation_id, emotion_data=None):
         """Save audio file and transcript to organized conversation folder ONLY"""
@@ -472,6 +467,7 @@ class HarryVoiceAssistant:
             json.dump(metadata, f, indent=2, ensure_ascii=False)
         
         print(f"💾 Conversation saved: {conv_dir.name}/")
+        
         return conv_dir
     
     def detect_emotion(self, audio, sample_rate):
@@ -511,12 +507,24 @@ class HarryVoiceAssistant:
             return None
     
     def get_harry_response(self, text):
-        """Get response from Harry Potter AI"""
+        """Get response from Harry Potter AI with context from previous conversations"""
         
         print("🧠 Harry is thinking...", end='', flush=True)
         
         try:
-            response, latency = self.harry.ask_harry(text)
+            # Add context from previous conversations if enabled
+            if self.enable_context and self.context_manager:
+                context = self.context_manager.build_context_for_harry()
+                if context:
+                    # Prepend context to the user's question
+                    text_with_context = context + "\n\nCURRENT QUESTION: " + text
+                else:
+                    text_with_context = text
+            else:
+                text_with_context = text
+            
+            # Generate Harry's response
+            response, latency = self.harry.ask_harry(text_with_context)
             print(f"\r✅ Response ready! ({latency}ms)     ")
             return response
             
@@ -666,7 +674,12 @@ class HarryVoiceAssistant:
                     # 6. Save conversation (audio + transcript + emotion)
                     conv_dir = self.save_conversation(audio, sample_rate, transcription, response, conversation_count, emotion_data)
                     
-                    # 7. Speak response (save to audio/ folder and conversation folder)
+                    # 7. Generate insights in background (if enabled)
+                    if self.enable_insights and self.analyzer:
+                        print("🔍 Generating insights in background...")
+                        self.analyzer.analyze_conversation_async(conv_dir)
+                    
+                    # 8. Speak response (save to audio/ folder and conversation folder)
                     self.speak(response, conversation_count, conv_dir)
                     
                     print()
@@ -730,6 +743,11 @@ class HarryVoiceAssistant:
                     # Save conversation (audio + transcript + emotion)
                     conv_dir = self.save_conversation(audio, sample_rate, transcription, response, conversation_count, emotion_data)
                     
+                    # Generate insights in background (if enabled)
+                    if self.enable_insights and self.analyzer:
+                        print("🔍 Generating insights in background...")
+                        self.analyzer.analyze_conversation_async(conv_dir)
+                    
                     print()
                     self.speak(response, conversation_count, conv_dir)
                 
@@ -744,16 +762,21 @@ def main():
     
     import argparse
     
-    parser = argparse.ArgumentParser(description="Harry Potter Voice Assistant")
-    parser.add_argument('--test', action='store_true', 
+    parser = argparse.ArgumentParser(description="Harry Potter Voice Assistant (NPU-Powered)")
+    parser.add_argument('--test', action='store_true',
                        help='Test mode (skip wake word, use ENTER key)')
-    parser.add_argument('--cpu', action='store_true',
-                       help='CPU mode (use CPU for Whisper and LLM, skip NPU)')
+    parser.add_argument('--no-context', action='store_true',
+                       help='Disable conversation context (ignore previous insights)')
+    parser.add_argument('--no-insights', action='store_true',
+                       help='Disable automatic insight generation')
     
     args = parser.parse_args()
     
     # Initialize assistant
-    assistant = HarryVoiceAssistant(cpu_mode=args.cpu)
+    assistant = HarryVoiceAssistant(
+        enable_context=not args.no_context,
+        enable_insights=not args.no_insights
+    )
     
     # Run in appropriate mode
     if args.test:

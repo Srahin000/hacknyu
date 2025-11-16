@@ -1,0 +1,28 @@
+{
+  "conversation_id": 1,
+  "timestamp": "2025-11-16T02:28:25.393599",
+  "date": "20251116",
+  "time": "022825",
+  "user_query": "I don't know how to do my homework. Can you help me please?",
+  "harry_response": "It's not exactly homework, it's just a bit of extra work to help me with my Transfiguration homework. Let's just say it's a Quidditch match of a problem, and I need someone to lend a hand.",
+  "sample_rate": 16000,
+  "audio_duration_seconds": 6.0,
+  "stt_type": "whisper-cpu",
+  "tts_type": "pyttsx3",
+  "emotion_type": "npu",
+  "wake_word_type": "picovoice",
+  "emotion": {
+    "detected": "neutral",
+    "confidence": 0.5,
+    "latency_ms": 627,
+    "all_scores": {
+      "angry": 0.14191025495529175,
+      "disgust": 0.155693918466568,
+      "fear": 0.1485460251569748,
+      "happy": 0.12438027560710907,
+      "neutral": 0.1380361169576645,
+      "sad": 0.1519017219543457,
+      "surprise": 0.1395317167043686
+    }
+  }
+}
