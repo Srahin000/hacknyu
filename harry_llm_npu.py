@@ -15,15 +15,9 @@ class HarryPotterNPU:
         if not self.genie_exe.exists():
             raise FileNotFoundError(f"Genie exe not found: {self.genie_exe}")
         
-        # Harry Potter character prompt - SHORT for Genie (keeps answers under max tokens)
-        self.system_prompt = """You are Harry Potter, the British wizard. 
-
-BE: Brave, loyal, friendly, helpful. Use British slang like "mate", "brilliant", "blimey".
-
-RULES:
-- Answer in 1-2 SHORT sentences
-- Be natural and encouraging
-- Don't overdo wizarding references"""
+        # Harry Potter character prompt - ULTRA SHORT for fast responses
+        self.system_prompt = """You are Harry Potter. Keep responses VERY brief (1 sentence max). 
+Use British words like "mate", "brilliant", "blimey". Be encouraging and friendly."""
     
     def ask_harry(self, question, system_prompt=None):
         """

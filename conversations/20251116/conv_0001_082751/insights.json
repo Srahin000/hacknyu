@@ -1,0 +1,22 @@
+{
+  "topics": [
+    "question",
+    "topic"
+  ],
+  "dominantEmotion": "Unknown",
+  "sentimentScore": 0,
+  "summary": "No clear sentiment detected, summary: No summary given.",
+  "keyPhrases": [
+    "Blimey",
+    "love"
+  ],
+  "engagementLevel": "medium",
+  "questionCount": 1,
+  "breakthrough": true,
+  "needsAttention": true,
+  "analyzedAt": "2025-11-16T08:28:23.405854",
+  "analysisLatencyMs": 31628,
+  "conversationId": 1,
+  "userId": "user-13ccb6163551",
+  "childId": "child-cfdd2047ed7b"
+}

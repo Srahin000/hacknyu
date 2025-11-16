@@ -713,42 +713,65 @@ class HarryVoiceAssistant:
         
         try:
             if self.tts_type == "pyttsx3":
-                # Save audio to file for avatar playback
-                audio_path = None
+                # ALWAYS use timestamped filename for webapp accessibility
+                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                audio_filename = f"harry_{timestamp}.wav"
+                
+                # Save to main audio directory (for webapp)
+                audio_path = self.audio_dir / audio_filename
+                
+                # Also save to conversation directory if available
                 if conversation_id and conv_dir:
-                    audio_path = conv_dir / "harry_response.wav"
+                    conv_audio_path = conv_dir / "harry_response.wav"
                 else:
-                    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                    audio_path = self.audio_dir / f"harry_{timestamp}.wav"
+                    conv_audio_path = None
                 
                 # Generate audio file
+                print(f"[TTS] Generating audio file: {audio_path}")
                 self.tts_engine.save_to_file(text, str(audio_path))
                 self.tts_engine.runAndWait()
                 
                 # Wait for file to be written
                 time.sleep(0.2)
                 
-                # Broadcast audio URL (relative path for webapp)
-                if audio_path.exists():
-                    # Copy to webapp public directory for serving
-                    webapp_audio_dir = Path("EDGEucatorWebApp/public/audio")
-                    webapp_audio_dir.mkdir(parents=True, exist_ok=True)
-                    webapp_audio_path = webapp_audio_dir / audio_path.name
-                    
+                # Check if file was created
+                if not audio_path.exists():
+                    print(f"[TTS] ❌ Audio file was not created: {audio_path}")
+                    self._broadcast_state('idle')
+                    return None
+                
+                print(f"[TTS] ✅ Audio file created: {audio_path} ({audio_path.stat().st_size} bytes)")
+                
+                # Copy to conversation directory if available
+                if conv_audio_path:
                     try:
                         import shutil
-                        shutil.copy2(audio_path, webapp_audio_path)
-                        # Use webapp-relative path
-                        audio_url = f"/audio/{audio_path.name}"
+                        shutil.copy2(audio_path, conv_audio_path)
+                        print(f"[TTS] Copied to conversation: {conv_audio_path}")
                     except Exception as e:
-                        print(f"[WebSocket] Failed to copy audio to webapp: {e}")
-                        # Fallback: use original path (may not work if not accessible)
-                        audio_url = f"/audio/{audio_path.name}" if audio_path.parent.name == "audio" else f"/audio/{audio_path.name}"
-                    
-                    self._broadcast_audio(audio_url)
+                        print(f"[TTS] Warning: Failed to copy to conversation directory: {e}")
                 
-                # Broadcast idle state when done
-                self._broadcast_state('idle')
+                # Copy to webapp public directory for serving
+                webapp_audio_dir = Path("EDGEucatorWebApp/public/audio")
+                webapp_audio_dir.mkdir(parents=True, exist_ok=True)
+                webapp_audio_path = webapp_audio_dir / audio_path.name
+                
+                try:
+                    import shutil
+                    print(f"[TTS] Copying audio to webapp: {audio_path} → {webapp_audio_path}")
+                    shutil.copy2(audio_path, webapp_audio_path)
+                    print(f"[TTS] ✅ Audio copied to webapp successfully")
+                    # Use webapp-relative path
+                    audio_url = f"/audio/{audio_path.name}"
+                except Exception as e:
+                    print(f"[TTS] ❌ Failed to copy audio to webapp: {e}")
+                    # Fallback: use original path (may not work if not accessible)
+                    audio_url = f"/audio/{audio_path.name}"
+                
+                self._broadcast_audio(audio_url)
+                print(f"[WebSocket] Sent audio URL to webapp: {audio_url}")
+                
+                # Don't broadcast idle here - webapp will do it after audio finishes playing
                 return audio_path
             
         except Exception as e:
@@ -776,6 +799,7 @@ class HarryVoiceAssistant:
     def _broadcast_audio(self, audio_url: str):
         """Broadcast audio URL (thread-safe)"""
         if self.websocket_server:
+            print(f"[WebSocket] Broadcasting audio URL: {audio_url}")
             try:
                 if self.websocket_server.loop and self.websocket_server.loop.is_running():
                     asyncio.run_coroutine_threadsafe(
@@ -786,6 +810,8 @@ class HarryVoiceAssistant:
                     asyncio.run(self.websocket_server.broadcast_audio(audio_url))
             except Exception as e:
                 print(f"[WebSocket] Failed to broadcast audio: {e}")
+        else:
+            print(f"[WebSocket] Cannot broadcast audio - WebSocket server not running")
     
     def run(self):
         """Run the voice assistant loop"""
