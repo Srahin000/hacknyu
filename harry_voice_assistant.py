@@ -112,10 +112,10 @@ class HarryVoiceAssistant:
             
             # Try to create Porcupine with better error handling
             try:
-                self.porcupine = pvporcupine.create(
-                    access_key=access_key,
-                    keyword_paths=[str(ppn_file)]
-                )
+            self.porcupine = pvporcupine.create(
+                access_key=access_key,
+                keyword_paths=[str(ppn_file)]
+            )
                 self.wake_word_type = "picovoice"
                 self.wake_word_ready = True
                 print("  ✅ Wake word ready: 'Harry Potter' (Picovoice)")
@@ -190,8 +190,8 @@ class HarryVoiceAssistant:
             except Exception as e2:
                 print(f"  ❌ CPU Whisper also failed: {e2}")
                 print(f"     Install with: pip install openai-whisper")
-                import traceback
-                traceback.print_exc()
+            import traceback
+            traceback.print_exc()
     
     def _init_llm(self):
         """Initialize LLM (NPU Genie or CPU fallback)"""
@@ -427,14 +427,14 @@ class HarryVoiceAssistant:
         """Transcribe audio to text using Whisper (NPU or CPU)"""
 
         if self.stt_type == "whisper-npu":
-            print("🔄 Transcribing on NPU...", end='', flush=True)
+        print("🔄 Transcribing on NPU...", end='', flush=True)
         else:
             print("🔄 Transcribing on CPU...", end='', flush=True)
 
         try:
             transcription, latency = self.stt_model.transcribe(audio, sample_rate)
             if self.stt_type == "whisper-npu":
-                print(f"\r✅ Transcribed! ({latency}ms on NPU)       ")
+            print(f"\r✅ Transcribed! ({latency}ms on NPU)       ")
             else:
                 print(f"\r✅ Transcribed! ({latency}ms on CPU)       ")
             return transcription
@@ -496,8 +496,8 @@ class HarryVoiceAssistant:
                 os.unlink(temp_path)
             elif self.tts_type == "pyttsx3":
                 # pyttsx3 fallback
-                self.tts_engine.say(text)
-                self.tts_engine.runAndWait()
+            self.tts_engine.say(text)
+            self.tts_engine.runAndWait()
             
         except Exception as e:
             print(f"❌ TTS error: {e}")
@@ -514,7 +514,7 @@ class HarryVoiceAssistant:
         if self.wake_word_type == "keyboard":
             print("  ⌨️  Press ENTER to activate")
         else:
-            print("  👂 Say 'HARRY POTTER' to activate")
+        print("  👂 Say 'HARRY POTTER' to activate")
         print("  💬 Then ask your question")
         print("  ⚡ Harry will respond with voice")
         print()
@@ -533,7 +533,7 @@ class HarryVoiceAssistant:
                 if self.wake_word_type == "keyboard":
                     print("🟢 Press ENTER to activate", end='', flush=True)
                 else:
-                    print("🟢 Listening for wake word", end='', flush=True)
+                print("🟢 Listening for wake word", end='', flush=True)
                 
                 detected = self.listen_for_wake_word()
                 

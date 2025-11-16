@@ -1,10 +1,10 @@
 """
 Full NPU Whisper - Encoder + Decoder on Snapdragon X Elite
 
-Uses QNN Runtime with .bin files (not ONNX):
+Uses QNN Runtime with ONNX models:
 - HfWhisperApp from qai_hub_models.models._shared.hf_whisper.app
-- OnnxModelTorchWrapper.OnNPU() can accept both .bin (QNN) and .onnx files
-- Prefers .bin files for QNN runtime, falls back to .onnx if needed
+- OnnxModelTorchWrapper.OnNPU() loads model.onnx files (with external .bin weights)
+- Requires proper ONNX model structure, NOT standalone .bin files
 
 Reference: https://github.com/quic/ai-hub-apps/tree/main/apps/windows/python/Whisper
 """
@@ -33,26 +33,22 @@ class WhisperNPU:
         except ImportError as e:
             raise ImportError(f"qai_hub_models not properly installed: {e}")
         
-        # Check for QNN runtime .bin files first, then fallback to .onnx
-        # QNN runtime uses .bin files (not ONNX)
+        # QNN runtime requires ONNX files (.onnx) with external .bin weights
+        # The .bin files alone are NOT valid ONNX models
         encoder_path = None
         decoder_path = None
         
-        # Try QNN .bin files first (QNN runtime artifacts)
+        # Look for proper ONNX models (not standalone .bin files)
         possible_encoder_paths = [
-            "models/whisper_base-hfwhisperencoder-qualcomm_snapdragon_x_elite.bin",
-            "models/whisper_base2/model.bin",
-            "models/HfWhisperEncoder/model.bin",
-            "models/HfWhisperEncoder/model.onnx",  # Fallback to ONNX
             "build/whisper_base_float/precompiled/qualcomm-snapdragon-x-elite/HfWhisperEncoder/model.onnx",
+            "models/HfWhisperEncoder/model.onnx",
+            "models/whisper_base2/model.onnx",
         ]
         
         possible_decoder_paths = [
-            "models/whisper_base-hfwhisperdecoder-qualcomm_snapdragon_x_elite.bin",
-            "models/whisper_base/model.bin",
-            "models/HfWhisperDecoder/model.bin",
-            "models/HfWhisperDecoder/model.onnx",  # Fallback to ONNX
             "build/whisper_base_float/precompiled/qualcomm-snapdragon-x-elite/HfWhisperDecoder/model.onnx",
+            "models/HfWhisperDecoder/model.onnx",
+            "models/whisper_base/model.onnx",
         ]
         
         for path in possible_encoder_paths:
@@ -67,12 +63,11 @@ class WhisperNPU:
         
         if not encoder_path or not decoder_path:
             raise FileNotFoundError(
-                f"Whisper models not found. Expected QNN runtime .bin files:\n"
-                f"  - models/whisper_base-hfwhisperencoder-qualcomm_snapdragon_x_elite.bin\n"
-                f"  - models/whisper_base-hfwhisperdecoder-qualcomm_snapdragon_x_elite.bin\n"
-                f"\nOr ONNX fallback:\n"
-                f"  - models/HfWhisperEncoder/model.onnx\n"
-                f"  - models/HfWhisperDecoder/model.onnx"
+                f"Whisper ONNX models not found. Expected structure:\n"
+                f"  - build/whisper_base_float/precompiled/qualcomm-snapdragon-x-elite/HfWhisperEncoder/model.onnx\n"
+                f"  - build/whisper_base_float/precompiled/qualcomm-snapdragon-x-elite/HfWhisperDecoder/model.onnx\n"
+                f"\nNote: Standalone .bin files are NOT valid ONNX models.\n"
+                f"You need the complete directory with model.onnx + external .bin weights."
             )
         
         print(f"  Using encoder: {encoder_path}")
@@ -112,9 +107,9 @@ class WhisperNPU:
             # HfWhisperApp.transcribe expects both audio (numpy array) and sample_rate
             # It handles all preprocessing and decoding internally
             transcription = self.app.transcribe(audio, sample_rate)
-            
+        
             latency_ms = int((time.time() - start_time) * 1000)
-            
+        
             return transcription, latency_ms
             
         except Exception as e:
