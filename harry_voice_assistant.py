@@ -59,6 +59,11 @@ class HarryVoiceAssistant:
         # Storage setup
         self.storage_dir = Path("conversations")
         self.storage_dir.mkdir(exist_ok=True)
+        
+        # Single audio folder for ALL audio files
+        self.audio_dir = Path("audio")
+        self.audio_dir.mkdir(exist_ok=True)
+        
         self.conversation_count = 0
         
         # TTS parameters for Harry Potter voice
@@ -369,13 +374,21 @@ class HarryVoiceAssistant:
         return audio.flatten(), sample_rate
     
     def save_conversation(self, audio, sample_rate, transcription, harry_response, conversation_id):
-        """Save audio file and transcript with metadata"""
+        """Save audio file and transcript - saved in BOTH organized folders AND single audio folder"""
         
         # Create timestamp for this conversation
         timestamp = datetime.now()
         date_str = timestamp.strftime("%Y%m%d")
         time_str = timestamp.strftime("%H%M%S")
         
+        # Filename for this conversation
+        audio_filename = f"user_{date_str}_{time_str}_conv{conversation_id:04d}.wav"
+        
+        # ===== SAVE TO SINGLE AUDIO FOLDER (all files together) =====
+        audio_path_single = self.audio_dir / audio_filename
+        sf.write(str(audio_path_single), audio, sample_rate)
+        
+        # ===== SAVE TO ORGANIZED CONVERSATION FOLDER =====
         # Create date directory
         date_dir = self.storage_dir / date_str
         date_dir.mkdir(exist_ok=True)
@@ -384,22 +397,30 @@ class HarryVoiceAssistant:
         conv_dir = date_dir / f"conv_{conversation_id:04d}_{time_str}"
         conv_dir.mkdir(exist_ok=True)
         
-        # Save audio file
-        audio_path = conv_dir / "audio.wav"
-        sf.write(str(audio_path), audio, sample_rate)
+        # Save user audio in conversation folder
+        audio_path_organized = conv_dir / "user_audio.wav"
+        sf.write(str(audio_path_organized), audio, sample_rate)
         
-        # Save transcript
-        transcript_path = conv_dir / "transcript.txt"
-        with open(transcript_path, 'w', encoding='utf-8') as f:
-            f.write(f"Conversation #{conversation_id}\n")
-            f.write(f"Timestamp: {timestamp.strftime('%Y-%m-%d %H:%M:%S')}\n")
-            f.write("=" * 70 + "\n\n")
-            f.write("USER:\n")
-            f.write(f"{transcription}\n\n")
-            f.write("HARRY:\n")
-            f.write(f"{harry_response}\n")
+        # Save transcript in both places
+        transcript_content = (
+            f"Conversation #{conversation_id}\n"
+            f"Timestamp: {timestamp.strftime('%Y-%m-%d %H:%M:%S')}\n"
+            f"{'=' * 70}\n\n"
+            f"USER:\n{transcription}\n\n"
+            f"HARRY:\n{harry_response}\n"
+        )
         
-        # Save metadata JSON
+        # Transcript in single audio folder
+        transcript_path_single = self.audio_dir / f"user_{date_str}_{time_str}_conv{conversation_id:04d}.txt"
+        with open(transcript_path_single, 'w', encoding='utf-8') as f:
+            f.write(transcript_content)
+        
+        # Transcript in organized folder
+        transcript_path_organized = conv_dir / "transcript.txt"
+        with open(transcript_path_organized, 'w', encoding='utf-8') as f:
+            f.write(transcript_content)
+        
+        # Save metadata JSON in organized folder
         metadata = {
             "conversation_id": conversation_id,
             "timestamp": timestamp.isoformat(),
@@ -407,8 +428,7 @@ class HarryVoiceAssistant:
             "time": time_str,
             "user_query": transcription,
             "harry_response": harry_response,
-            "audio_file": str(audio_path.relative_to(self.storage_dir)),
-            "transcript_file": str(transcript_path.relative_to(self.storage_dir)),
+            "user_audio_file": audio_filename,
             "sample_rate": sample_rate,
             "audio_duration_seconds": len(audio) / sample_rate,
             "stt_type": self.stt_type,
@@ -420,8 +440,8 @@ class HarryVoiceAssistant:
         with open(metadata_path, 'w', encoding='utf-8') as f:
             json.dump(metadata, f, indent=2, ensure_ascii=False)
         
-        print(f"💾 Saved conversation to: {conv_dir}")
-        return conv_dir
+        print(f"💾 User audio saved: audio/{audio_filename} + {conv_dir.name}/")
+        return audio_path_single, conv_dir
     
     def transcribe_audio(self, audio, sample_rate):
         """Transcribe audio to text using Whisper (NPU or CPU)"""
@@ -459,26 +479,33 @@ class HarryVoiceAssistant:
             print(f"\r❌ LLM error: {e}")
             return None
     
-    def speak(self, text):
-        """Speak text using TTS"""
+    def speak(self, text, conversation_id=None, conv_dir=None):
+        """Speak text using TTS and save in BOTH single audio folder AND organized folder"""
         
         print(f"🔊 Harry speaks: \"{text}\"")
         
         try:
             if self.tts_type == "xtts_v2":
                 # XTTS v2: generate audio and play it
-                import tempfile
                 import sounddevice as sd
                 import soundfile as sf
                 
-                # Create temporary file
-                with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as tmp_file:
-                    temp_path = tmp_file.name
+                # Generate filename with timestamp
+                timestamp = datetime.now()
+                date_str = timestamp.strftime('%Y%m%d')
+                time_str = timestamp.strftime('%H%M%S')
+                filename = f"harry_{date_str}_{time_str}"
+                if conversation_id:
+                    filename += f"_conv{conversation_id:04d}"
+                filename += ".wav"
+                
+                # ===== SAVE TO SINGLE AUDIO FOLDER =====
+                audio_path_single = self.audio_dir / filename
                 
                 # Generate speech with Harry Potter voice parameters
                 self.tts_engine.tts_to_file(
                     text=text,
-                    file_path=temp_path,
+                    file_path=str(audio_path_single),
                     language="en",
                     speaker=self.tts_speaker,  # "male-en-2"
                     emotion=self.tts_emotion,  # "happy"
@@ -486,18 +513,36 @@ class HarryVoiceAssistant:
                     pitch=self.tts_pitch       # 1.20 (kid-like pitch)
                 )
                 
+                # Save transcript in single audio folder
+                transcript_path_single = audio_path_single.with_suffix('.txt')
+                with open(transcript_path_single, 'w', encoding='utf-8') as f:
+                    f.write(text)
+                
+                # ===== SAVE TO ORGANIZED CONVERSATION FOLDER (if provided) =====
+                if conv_dir:
+                    audio_path_organized = conv_dir / "harry_audio.wav"
+                    # Copy the audio file
+                    import shutil
+                    shutil.copy2(str(audio_path_single), str(audio_path_organized))
+                    
+                    # Save transcript in organized folder
+                    transcript_path_organized = conv_dir / "harry_response.txt"
+                    with open(transcript_path_organized, 'w', encoding='utf-8') as f:
+                        f.write(text)
+                
                 # Play the audio
-                audio_data, sample_rate = sf.read(temp_path)
+                audio_data, sample_rate = sf.read(str(audio_path_single))
                 sd.play(audio_data, sample_rate)
                 sd.wait()  # Wait until playback is finished
                 
-                # Clean up
-                import os
-                os.unlink(temp_path)
+                print(f"💾 Harry audio saved: audio/{filename}" + (f" + {conv_dir.name}/" if conv_dir else ""))
+                return audio_path_single
+                
             elif self.tts_type == "pyttsx3":
-                # pyttsx3 fallback
+                # pyttsx3 fallback (no file saving for pyttsx3)
                 self.tts_engine.say(text)
                 self.tts_engine.runAndWait()
+                return None
             
         except Exception as e:
             print(f"❌ TTS error: {e}")
@@ -554,7 +599,7 @@ class HarryVoiceAssistant:
                     
                     if not transcription or len(transcription.strip()) < 3:
                         print("⚠️  No speech detected. Try again!")
-                        self.speak("Sorry, I didn't hear anything. Try again.")
+                        self.speak("Sorry, I didn't hear anything. Try again.", conversation_count)
                         print()
                         continue
                     
@@ -571,10 +616,10 @@ class HarryVoiceAssistant:
                     print()
                     
                     # 5. Save conversation (audio + transcript)
-                    self.save_conversation(audio, sample_rate, transcription, response, conversation_count)
+                    _, conv_dir = self.save_conversation(audio, sample_rate, transcription, response, conversation_count)
                     
-                    # 6. Speak response
-                    self.speak(response)
+                    # 6. Speak response (save to both audio/ and organized folder)
+                    self.speak(response, conversation_count, conv_dir)
                     
                     print()
                     print("="*70)
@@ -632,10 +677,10 @@ class HarryVoiceAssistant:
                 
                 if response:
                     # Save conversation (audio + transcript)
-                    self.save_conversation(audio, sample_rate, transcription, response, conversation_count)
+                    _, conv_dir = self.save_conversation(audio, sample_rate, transcription, response, conversation_count)
                     
                     print()
-                    self.speak(response)
+                    self.speak(response, conversation_count, conv_dir)
                 
                 print("\n" + "="*70 + "\n")
                 

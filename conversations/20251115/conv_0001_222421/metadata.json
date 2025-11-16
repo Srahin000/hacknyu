@@ -1,0 +1,14 @@
+{
+  "conversation_id": 1,
+  "timestamp": "2025-11-15T22:24:21.524301",
+  "date": "20251115",
+  "time": "222421",
+  "user_query": "I love McDonald's. Do you like McDonald's?",
+  "harry_response": "I've had my fair share of greasy fast food, mate. McDonald's is alright, I suppose, but I'd rather have a butterbeer at the Three Broomsticks any day.",
+  "user_audio_file": "user_20251115_222421_conv0001.wav",
+  "sample_rate": 16000,
+  "audio_duration_seconds": 8.0,
+  "stt_type": "whisper-npu",
+  "tts_type": "pyttsx3",
+  "wake_word_type": "picovoice"
+}

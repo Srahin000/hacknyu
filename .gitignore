@@ -64,6 +64,9 @@ models/
 # Genie bundle (large NPU runtime files)
 genie_bundle/
 
+# Audio files (voice assistant recordings)
+audio/
+
 # Keep structure but ignore large files
 !deployed_models/.gitkeep
 !logs/.gitkeep
