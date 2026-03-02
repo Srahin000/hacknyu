@@ -9,6 +9,11 @@ EDGEucator is a privacy-focused educational platform that runs entirely on-devic
 
 This project is split into two modules for cross-platform compatibility and clear, parent-friendly data visualization:
 
+## 🔗 Repositories
+
+- **EDGEucator 3D Avatar WebApp:** https://github.com/Srahin000/EDGEucatorWebApp  
+- **EDGEucator Insights Dashboard:** https://github.com/Srahin000/EDGEucatorDashboard
+
 ### 1) EDGEucator 3D Avatar WebApp
 **Problem:** Unity-based avatars often fail on Windows ARM architecture.  
 **Solution:** A pure **Three.js + Ready Player Me** web stack with **Rhubarb viseme-based lip-sync**, enabling a lightweight, platform-agnostic 3D mentor interface.
