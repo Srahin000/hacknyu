@@ -1,67 +1,55 @@
-EDGEucator: Local AI-Powered Child Development & Mentorship
-Winner/Project for HackNYU 2024 A privacy-first, NPU-accelerated platform for child-AI interaction and parental insights.
+# EDGEucator: Privacy-First AI Mentorship
+**HackNYU 2024 Project** · Local AI Inference · 3D Visuals · Data Insights
 
-🚀 The Vision
-Most AI educational tools rely on the cloud, compromising privacy and requiring high latency. EDGEucator runs entirely locally. By leveraging Qualcomm’s NPU, we achieve sub-2-second inference for Llama 3B, providing a seamless, real-time "AI Mentor" experience that is private by design.
+EDGEucator is a privacy-focused educational platform that runs entirely on-device. By leveraging Qualcomm’s NPU to accelerate Llama 3B, it delivers a real-time AI mentor with **sub-2-second inference latency**, ensuring a child’s data never leaves local hardware.
 
-🛠️ Tech Stack & Architecture
-We split the project into two core modules to ensure cross-platform compatibility (specifically solving for Windows ARM) and a clean separation of concerns:
+---
 
-1. The AI Mentor Avatar (Frontend - WebApp)
-A browser-based 3D experience designed to replace heavy Unity-based solutions that fail on ARM architecture.
+## 🔗 Project Components
 
-Tech: Three.js, Ready Player Me, Web Audio API, TypeScript.
+This project is split into two modules for cross-platform compatibility and clear, parent-friendly data visualization:
 
-Key Feature: Professional viseme-based lip-sync using Rhubarb.
+### 1) EDGEucator 3D Avatar WebApp
+**Problem:** Unity-based avatars often fail on Windows ARM architecture.  
+**Solution:** A pure **Three.js + Ready Player Me** web stack with **Rhubarb viseme-based lip-sync**, enabling a lightweight, platform-agnostic 3D mentor interface.
 
-Innovation: Real-time mouth animation driven by local audio volume/morph targets.
+### 2) EDGEucator Insights Dashboard
+**Function:** A **Next.js 14** app that parses conversation data into:
+- emotional trends  
+- topic frequency  
+- personalized after-school recommendations  
 
-2. Child Insights Dashboard (Frontend - Dashboard)
-A Next.js 14 application that visualizes the "data behind the conversation."
+---
 
-Tech: Next.js (App Router), Tailwind CSS, Recharts, Lucide.
+## 🛠️ The Technical Edge
 
-Key Feature: Emotional tone tracking, interest mapping, and personalized club/activity recommendations.
+The core innovation is local hardware acceleration for heavy AI workloads:
 
-3. The "Brain" (Local Backend)
-Model: Llama 3B.
+- **NPU Acceleration:** Uses Qualcomm’s NPU for local LLM execution  
+- **Performance:** **< 2.0s inference** for conversational message generation using **Llama 3B**  
+- **Privacy by Design:** No cloud APIs — transcription, LLM processing, and sentiment analysis happen locally  
+- **Lip-Sync Engine:** Real-time jaw/mouth morph target animation driven by audio volume + **Rhubarb** viseme extraction  
 
-Hardware Acceleration: Qualcomm NPU integration.
+---
 
-Performance: <2.0s inference time for conversational message generation.
+## 🏗️ Architecture Overview
 
-Privacy: 100% local data processing; no data ever leaves the device.
+1. **Input:** Child speaks to the AI Mentor  
+2. **Processing:** Qualcomm NPU runs the prompt through Llama 3B locally  
+3. **Visualization:** Three.js WebApp renders the 3D response with synchronized lip-sync  
+4. **Analytics:** Dashboard extracts insights from the local database to show parents emotional well-being trends and interests  
 
-📂 Repository Structure
-This project is organized as a monorepo for the hackathon:
+---
 
-/EDGEucatorWebApp: The Three.js 3D Avatar interface.
+## 🚀 Getting Started
 
-/EDGEucatorDashboard: The Next.js analytics dashboard.
+### Prerequisites
+- **Node.js 18+**
+- **Qualcomm AI Stack** (for hardware-accelerated features)
 
-⚡ Quick Start
-Prerequisites
-Node.js 18+
+### Installation
+Clone the repo and navigate to the module you want to run:
 
-Qualcomm AI Stack (for NPU acceleration features)
-
-Installation
-Clone the hub:
-
-Bash
+```bash
 git clone https://github.com/Srahin000/hacknyu.git
 cd hacknyu
-Setup the Avatar:
-
-Bash
-cd EDGEucatorWebApp
-npm install && npm run dev
-Setup the Dashboard:
-
-Bash
-cd EDGEucatorDashboard
-npm install && npm run dev
-💡 Why This Matters
-Windows ARM devices often struggle with native 3D engines like Unity. By building a Three.js + NPU pipeline, we proved that high-fidelity AI characters and deep data analytics can run efficiently on low-power, privacy-focused hardware.
-
-This isn't just a chatbot; it's a private, local mentor that understands a child's growth.
